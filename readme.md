@@ -283,14 +283,15 @@ La décentralisation du registre ne garantit pas, à elle seule, l'impossibilit�
 ## 13. Équipe de développement
 
 **Projet :** P2P-VoteEngine  
-**Équipe :** 6 membres  
- -DJOUDA DOUANLA ANAËL:@devdouanla237
+**Équipe :** 6 membres
 
-- :@claire-mveng
-- @cedricfotsa-web
-- @EBIGUITE-Theresa
-- @nkamolga-alt
-- @TCHOUAMANI
+- [@devdouanla237]
+
+- [@claire-mveng]
+- [@cedricfotsa-web]
+- [@EBIGUITE-Theresa]
+- [@nkamolga-alt]
+- [@TCHOUAMANI]
 
 - **Type :** Application web de vote électronique décentralisée  
   **Encadrement :** Projet académique sous l'encadrement de @davart87
