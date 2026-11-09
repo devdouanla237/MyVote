@@ -1,0 +1,6 @@
+@import url("./variables.css");
+
+h1 {
+  font-size: 2rem;
+  color: var(--primary);
+}

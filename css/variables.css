@@ -1,0 +1,26 @@
+:root {
+--primary: #1D4ED8;
+--accent: #0D9488;
+--bg: #F8FAFC;
+--surface: #FFFFFF;
+--text: #0F172A;
+--text-muted: #475569;
+--border: #E2E8F0;
+--success: #16A34A;
+--warning: #D97706;
+--danger: #DC2626;
+--info: #0284C7;
+}
+:root[data-theme="dark"] {
+--primary: #60A5FA;
+--accent: #2DD4BF;
+--bg: #0F172A;
+--surface: #1E293B;
+--text: #E2E8F0;
+--text-muted: #94A3B8;
+--border: #334155;
+--success: #4ADE80;
+--warning: #FBBF24;
+--danger: #F87171;
+--info: #38BDF8;
+}
