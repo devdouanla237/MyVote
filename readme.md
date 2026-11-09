@@ -285,13 +285,13 @@ La décentralisation du registre ne garantit pas, à elle seule, l'impossibilit�
 **Projet :** P2P-VoteEngine  
 **Équipe :** 6 membres
 
-- [@devdouanla237]
+- [@devdouanla237](https://github.com/devdouanla237)
 
-- [@claire-mveng]
-- [@cedricfotsa-web]
-- [@EBIGUITE-Theresa]
-- [@nkamolga-alt]
-- [@TCHOUAMANI]
+- [@claire-mveng](https://github.com/Claire-Mveng)
+- [@cedricfotsa-web](https://github.com/cedricfotsa-web)
+- [@EBIGUITE-Theresa](https://github.com/EBIGUITE-Theresa)
+- [@nkamolga-alt](https://github.com/nkamolga-alt)
+- [@TCHOUAMANI](https://github.com/TCHOUAMANI)
 
 - **Type :** Application web de vote électronique décentralisée  
   **Encadrement :** Projet académique sous l'encadrement de @davart87
