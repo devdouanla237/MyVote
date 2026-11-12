@@ -117,18 +117,7 @@ Chaque module dispose également d'une page de démonstration :
 
 La branche `main` est protégée.
 
-Chaque membre travaille sur une branche dédiée :
 
-```text
-main
-│
-├── feature/reseau-p2p
-├── feature/cryptographie
-├── feature/ledger
-├── feature/organisateur
-├── feature/electeur-ui
-└── feature/depouillement
-```
 
 Toute modification doit passer par une Pull Request (PR).
 
@@ -294,8 +283,8 @@ La décentralisation du registre ne garantit pas, à elle seule, l'impossibilit�
 - [@TCHOUAMANI](https://github.com/TCHOUAMANI)
 
 - **Type :** Application web de vote électronique décentralisée  
-  **Encadrement :** Projet académique sous l'encadrement de @davart87
-  **Soutenance :** Janvier 2027
+  **Encadrement :** Projet académique sous l'encadrement de @davart87 (https://github.com/davart87)
+ 
 
 ---
 
