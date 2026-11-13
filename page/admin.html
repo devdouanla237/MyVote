@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="../css/admin.css">
+
+    <title>Formulaire</title>
+
+</head>
+<body>
+
+    <h1>Formulaire de creation</h1>
+    <form id="form">
+        <div class="title">
+            <label for="title">Titre:</label>
+            <input type="text" id="title" name="title" maxlength="100" placeholder=" Votre Titre" required>
+        </div>
+
+        <br><br>
+        <div class="descr">
+            <label for="descr">Description:</label>
+            <textarea id="descr" name="descr" placeholder="Votre Description"></textarea>
+        </div>
+
+        <br><br>
+        <div class="date">
+            <label for="time">Date Fin:</label>
+            <input type="datetime-local" id="time" name="time">
+        </div>
+
+        <br><br>
+        <div class="button">
+            <label for="button">Aperçu</label>
+            <input type="button" id="button" name="button" value="Aperçu">
+        </div>
+
+        <br><br>
+
+    </form>
+
+    <h2>Résultat</h2>
+    <pre id="résultat"></pre>
+
+    <script src="../js/admin/createForm.js"></script>    <!--script connects js to html page>
+
+</body>
+</html>
