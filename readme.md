@@ -291,3 +291,4 @@ La décentralisation du registre ne garantit pas, à elle seule, l'impossibilit�
 ### Licence
 
 Projet réalisé dans un cadre académique.
+feat(network): implémenter la création de session hôte avec un identifiant personnalisé

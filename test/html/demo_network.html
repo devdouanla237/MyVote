@@ -86,6 +86,23 @@
         <div id="logs"></div>
 
     </section>
+    <section>
+
+    <h2>Héberger une session</h2>
+
+    <input
+        type="text"
+        id="sessionId"
+        placeholder="Exemple : TEST1234"
+    >
+
+    <button id="hostButton">
+        Héberger
+    </button>
+
+    <div id="hostLog"></div>
+
+</section>
 <script type="module">
 import NetworkManager from "../../js/NetworkManager/network.js";
 
@@ -235,7 +252,38 @@ document.getElementById("destroy").addEventListener("click", () => {
     log("Réseau détruit.");
 
 });
+import { hostSession } from "../../js/NetworkManager/host.js";
 
+
+const hostButton = document.getElementById("hostButton");
+
+const sessionInput = document.getElementById("sessionId");
+
+const hostLog = document.getElementById("hostLog");
+
+
+hostButton.addEventListener("click", async () => {
+
+    const sessionId = sessionInput.value.trim();
+
+    hostLog.textContent = "Création de la session...";
+
+    try {
+
+        const id = await hostSession(sessionId);
+
+        hostLog.textContent = `Hôte prêt : ${id}`;
+
+    } catch (error) {
+
+        hostLog.textContent =
+            `${error.code} : ${error.message}`;
+
+        console.error(error);
+
+    }
+
+});
 </script>
 
 
