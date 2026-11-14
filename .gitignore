@@ -1,0 +1,79 @@
+# ==============================
+# Dépendances
+# ==============================
+node_modules/
+bower_components/
+
+# ==============================
+# Fichiers de configuration locaux
+# ==============================
+.env
+.env.*
+!.env.example
+
+# ==============================
+# Logs
+# ==============================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ==============================
+# Fichiers temporaires
+# ==============================
+tmp/
+temp/
+.cache/
+*.tmp
+*.bak
+*.swp
+
+# ==============================
+# IDE et éditeurs
+# ==============================
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# ==============================
+# Système d'exploitation
+# ==============================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==============================
+# Build et distribution
+# ==============================
+dist/
+build/
+out/
+coverage/
+
+# ==============================
+# Tests
+# ==============================
+.nyc_output/
+
+# ==============================
+# Fichiers de verrouillage temporaires
+# ==============================
+*.pid
+*.seed
+
+# ==============================
+# Bases de données locales
+# ==============================
+*.sqlite
+*.sqlite3
+*.db
+
+# ==============================
+# Certificats et clés privées
+# ==============================
+*.pem
+*.key
+*.crt

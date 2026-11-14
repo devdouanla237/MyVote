@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/devdouanla237/MyVote/issues"
   },
-  "homepage": "https://github.com/devdouanla237/MyVote#readme"
+  "homepage": "https://github.com/devdouanla237/MyVote#readme",
+  "dependencies": {
+    "peerjs": "^1.5.5"
+  }
 }

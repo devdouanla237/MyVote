@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Test NetworkManager</title>
+
+</head>
+
+<body>
+
+    <h1>Test du réseau P2P</h1>
+
+    <section>
+
+        <h2>Initialisation</h2>
+
+        <button id="start">
+            Démarrer
+        </button>
+
+        <button id="destroy">
+            Détruire
+        </button>
+
+        <p>
+            Mon ID :
+            <strong id="myId">Non connecté</strong>
+        </p>
+
+    </section>
+
+
+    <hr>
+
+
+    <section>
+
+        <h2>Connexion à un participant</h2>
+
+        <input
+            type="text"
+            id="peerId"
+            placeholder="Identifiant du pair"
+        >
+
+        <button id="connect">
+            Se connecter
+        </button>
+
+    </section>
+
+
+    <hr>
+
+
+    <section>
+
+        <h2>Envoyer un message</h2>
+
+        <input
+            type="text"
+            id="message"
+            placeholder="Votre message"
+        >
+
+        <button id="send">
+            Envoyer
+        </button>
+
+    </section>
+
+
+    <hr>
+
+
+    <section>
+
+        <h2>Journal des événements</h2>
+
+        <div id="logs"></div>
+
+    </section>
+    <section>
+
+    <h2>Héberger une session</h2>
+
+    <input
+        type="text"
+        id="sessionId"
+        placeholder="Exemple : TEST1234"
+    >
+
+    <button id="hostButton">
+        Héberger
+    </button>
+
+    <div id="hostLog"></div>
+
+</section>
+<script type="module">
+import NetworkManager from "../../js/NetworkManager/network.js";
+
+// Création du gestionnaire réseau
+const network = new NetworkManager();
+
+
+// Fonction d'affichage des événements
+function log(message) {
+
+    const logs = document.getElementById("logs");
+
+    const p = document.createElement("p");
+
+    p.textContent = message;
+
+    logs.appendChild(p);
+
+}
+
+
+// Événement OPEN
+network.on("open", id => {
+
+    document.getElementById("myId").textContent = id;
+
+    log("OPEN : " + id);
+
+});
+
+
+// Événement CONNECTION
+network.on("connection", peerId => {
+
+    log("CONNECTION : " + peerId);
+
+});
+
+
+// Événement DATA
+network.on("data", message => {
+
+    log("DATA : " + JSON.stringify(message));
+
+});
+
+
+// Événement CLOSE
+network.on("close", peerId => {
+
+    log("CLOSE : " + peerId);
+
+});
+
+
+// Événement ERROR
+network.on("error", error => {
+
+    log(
+        "ERROR : " + error.type + " - " + error.message
+    );
+
+});
+
+
+// Démarrer le réseau
+document.getElementById("start").addEventListener("click", async () => {
+
+    try {
+
+        const id = await network.init();
+
+        log("Réseau démarré : " + id);
+
+    } catch (error) {
+
+        log("Erreur : " + error.message);
+
+    }
+
+});
+
+
+// Se connecter à un participant
+document.getElementById("connect").addEventListener("click", () => {
+
+    const peerId = document
+        .getElementById("peerId")
+        .value
+        .trim();
+
+    try {
+
+        network.connectTo(peerId);
+
+        log("Tentative de connexion à : " + peerId);
+
+    } catch (error) {
+
+        log("Erreur : " + error.message);
+
+    }
+
+});
+
+
+// Envoyer un message
+document.getElementById("send").addEventListener("click", () => {
+
+    const peerId = document
+        .getElementById("peerId")
+        .value
+        .trim();
+
+    const message = document
+        .getElementById("message")
+        .value;
+
+    try {
+
+        network.send(peerId, {
+
+            message: message,
+
+            date: new Date().toISOString()
+
+        });
+
+        log("Message envoyé.");
+
+    } catch (error) {
+
+        log("Erreur : " + error.message);
+
+    }
+
+});
+
+
+// Détruire le réseau
+document.getElementById("destroy").addEventListener("click", () => {
+
+    network.destroy();
+
+    document.getElementById("myId").textContent = "Déconnecté";
+
+    log("Réseau détruit.");
+
+});
+import { hostSession } from "../../js/NetworkManager/host.js";
+
+
+const hostButton = document.getElementById("hostButton");
+
+const sessionInput = document.getElementById("sessionId");
+
+const hostLog = document.getElementById("hostLog");
+
+
+hostButton.addEventListener("click", async () => {
+
+    const sessionId = sessionInput.value.trim();
+
+    hostLog.textContent = "Création de la session...";
+
+    try {
+
+        const id = await hostSession(sessionId);
+
+        hostLog.textContent = `Hôte prêt : ${id}`;
+
+    } catch (error) {
+
+        hostLog.textContent =
+            `${error.code} : ${error.message}`;
+
+        console.error(error);
+
+    }
+
+});
+</script>
+
+
+
+</body>
+
+</html>
