@@ -285,7 +285,7 @@ La décentralisation du registre ne garantit pas, à elle seule, l'impossibilit�
 - **Type :** Application web de vote électronique décentralisée  
   **Encadrement :** Projet académique sous l'encadrement de @davart87 (https://github.com/davart87)
  
-
+feat(network): ajout du maillage P2P des peers (T1.4)
 ---
 
 ### Licence

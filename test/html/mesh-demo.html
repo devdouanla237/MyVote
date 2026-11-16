@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>T1.4 — Test du maillage P2P</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --fg:#1b1f24; --muted:#6b7280; --ok:#16a34a; --ko:#dc2626; --warn:#d97706; --bd:#e5e7eb; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0f1216; --card:#181c22; --fg:#e6e8eb; --muted:#9aa3af; --bd:#2a3039; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.5 system-ui, sans-serif; background:var(--bg); color:var(--fg); }
+  main { max-width: 860px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+  .card { background:var(--card); border:1px solid var(--bd); border-radius:10px; padding:16px; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  input { padding:8px 10px; border:1px solid var(--bd); border-radius:6px; background:transparent; color:inherit; text-transform:uppercase; width:130px; }
+  button { padding:8px 14px; border:0; border-radius:6px; background:#2563eb; color:#fff; cursor:pointer; }
+  button.alt { background:#475569; } button:disabled { opacity:.5; cursor:default; }
+  .dot { width:10px; height:10px; border-radius:50%; background:var(--muted); display:inline-block; }
+  .dot.on { background:var(--ok); } .dot.err { background:var(--ko); }
+  .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; } @media (max-width:640px){ .grid{grid-template-columns:1fr;} }
+  ul { margin:6px 0 0; padding-left:18px; } code { font-size:13px; }
+  #log { max-height:260px; overflow:auto; font:12px/1.6 ui-monospace, monospace; }
+  .j { color:var(--ok); } .l { color:var(--ko); }
+</style>
+
+<!-- Si tu utilises un bundler (Vite...), supprime cet importmap : "peerjs" sera résolu par le bundler -->
+<script type="importmap">
+{ "imports": { "peerjs": "https://esm.sh/peerjs@1.5.4" } }
+</script>
+</head>
+<body>
+<main>
+  <h1 style="margin:0">T1.4 — Maillage des peers</h1>
+
+  <section class="card">
+    <div class="row">
+      <input id="sid" maxlength="8" placeholder="SESSION ID">
+      <button id="host">Créer (hôte)</button>
+      <button id="join" class="alt">Rejoindre</button>
+      <button id="leave" class="alt" disabled>Fermer ce nœud</button>
+      <span><span id="dot" class="dot"></span> <span id="status">hors ligne</span></span>
+    </div>
+    <p style="margin:8px 0 0;color:var(--muted)">Mon id : <code id="me">—</code></p>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <strong>Voisins : <span id="count">0</span></strong>
+      <ul id="peers"></ul>
+      <div class="row" style="margin-top:12px">
+        <button id="ping" class="alt" disabled>Broadcast « salut »</button>
+      </div>
+    </section>
+    <section class="card">
+      <strong>Événements</strong>
+      <div id="log"></div>
+    </section>
+  </div>
+</main>
+
+<script type="module">
+  import { network, hostSession } from "../../js/NetworkManager/host.js";
+  import { joinSession, setNetworkManager } from "../../js/NetworkManager/join.js";
+  import { startMesh, stopMesh } from "../../js/NetworkManager/mesh.js";
+
+  const $ = (id) => document.getElementById(id);
+  let mesh = null;
+
+  const log = (txt, cls = "") => {
+    const d = document.createElement("div");
+    d.className = cls;
+    d.textContent = new Date().toLocaleTimeString() + "  " + txt;
+    $("log").prepend(d);
+  };
+  const short = (id) => (id.length > 12 ? id.slice(0, 8) + "…" : id);
+
+  function render() {
+    const peers = mesh ? mesh.getPeers() : [];
+    $("count").textContent = peers.length;
+    $("peers").innerHTML = peers.map((p) => `<li><code>${short(p)}</code></li>`).join("");
+  }
+
+  function setStatus(txt, cls = "") {
+    $("status").textContent = txt;
+    $("dot").className = "dot " + cls;
+  }
+
+  function attach(m) {
+    mesh = m;
+    m.on("peer-joined", (id) => { log("peer-joined " + short(id), "j"); render(); });
+    m.on("peer-left",   (id) => { log("peer-left "   + short(id), "l"); render(); });
+    m.on("mesh-ready",  (i)  => { log("mesh-ready : " + i.peers.length + " voisin(s)" + (i.failed.length ? ", échecs : " + i.failed.length : "")); render(); });
+    network.on("data", ({ from, data }) => {
+      if (data && data.demo) log("message de " + short(from) + " : " + data.demo);
+    });
+    $("host").disabled = $("join").disabled = true;
+    $("leave").disabled = $("ping").disabled = false;
+    $("me").textContent = network.getPeerId();
+    setStatus("en ligne", "on");
+    render();
+  }
+
+  // Génère un Session ID valide (8 caractères A-Z / 0-9)
+  function newSessionId() {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const bytes = crypto.getRandomValues(new Uint8Array(8));
+    return [...bytes].map((b) => chars[b % chars.length]).join("");
+  }
+
+  $("host").onclick = async () => {
+    const id = $("sid").value.trim().toUpperCase() || newSessionId();
+    $("sid").value = id;
+    setStatus("connexion…");
+    try {
+      await hostSession(id);
+      attach(startMesh(network, { isHost: true }));
+      log("session créée : " + id);
+    } catch (e) {
+      setStatus("erreur", "err");
+      log("échec hôte : " + (e.code || e.message), "l");
+    }
+  };
+
+  $("join").onclick = async () => {
+    setNetworkManager(network);
+    setStatus("connexion…");
+    try {
+      const hostId = await joinSession($("sid").value);
+      attach(startMesh(network, { hostId }));
+      log("session rejointe : " + hostId);
+    } catch (e) {
+      setStatus("erreur", "err");
+      log("échec join : " + (e.code || e.message), "l");
+    }
+  };
+
+  $("ping").onclick = () => {
+    const n = mesh.broadcast({ demo: "salut de " + short(network.getPeerId()) });
+    log("envoyé à " + n + " voisin(s)");
+  };
+
+  $("leave").onclick = () => {
+    stopMesh();
+    network.destroy();
+    mesh = null;
+    render();
+    setStatus("nœud fermé (recharge la page pour recommencer)", "err");
+    $("leave").disabled = $("ping").disabled = true;
+  };
+
+  window.addEventListener("beforeunload", () => network.destroy());
+</script>
+</body>
+</html>
