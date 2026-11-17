@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+</head>
+<body>
+    <h1>Génération de clés</h1>
+
+  <button id="bouton">Générer</button>
+
+  <h2>Clé publique</h2>
+  <pre id="publique"></pre>
+
+  <h2>Clé privée</h2>
+  <pre id="privee"></pre>
+
+  <script src="../js/crypto/keys.js"></script>
+
+  <script>
+    const bouton = document.getElementById("bouton");
+    const zonePublique = document.getElementById("publique");
+    const zonePrivee = document.getElementById("privee");
+
+    bouton.addEventListener("click", async function () {
+    
+      const cles = await generateKeyPair();
+
+      zonePublique.textContent = JSON.stringify(cles.publicKey, null, 2);
+      zonePrivee.textContent = JSON.stringify(cles.privateKey, null, 2);
+
+      await importPublicKey(cles.publicKey);
+      await importPrivateKey(cles.privateKey);
+      console.log("OK");
+    });
+  </script>
+  
+    
+</body>
+</html>
