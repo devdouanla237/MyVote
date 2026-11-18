@@ -12,7 +12,7 @@ const parametreImport = {
 };
 
 
-async function generateKeyPair() {
+ export async function generateKeyPair() {
 
   const paire = await crypto.subtle.generateKey(
     parametreRSA,
@@ -26,7 +26,7 @@ async function generateKeyPair() {
   return { publicKey: publicKey, privateKey: privateKey };
 }
 
-async function importPublicKey(jwk) {
+export async function importPublicKey(jwk) {
   return await crypto.subtle.importKey(
     "jwk",
     jwk,
@@ -36,7 +36,7 @@ async function importPublicKey(jwk) {
   );
 }
 
-async function importPrivateKey(jwk) {
+export async function importPrivateKey(jwk) {
   return await crypto.subtle.importKey(
     "jwk",
     jwk,

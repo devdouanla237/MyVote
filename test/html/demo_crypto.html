@@ -16,9 +16,9 @@
   <h2>Clé privée</h2>
   <pre id="privee"></pre>
 
-  <script src="../js/crypto/keys.js"></script>
 
-  <script>
+  <script type="module"   >
+    import { generateKeyPair, importPublicKey, importPrivateKey } from "../../js/crypto/keys.js";
     const bouton = document.getElementById("bouton");
     const zonePublique = document.getElementById("publique");
     const zonePrivee = document.getElementById("privee");
@@ -26,6 +26,7 @@
     bouton.addEventListener("click", async function () {
     
       const cles = await generateKeyPair();
+      console.log("Clés générées :", cles);
 
       zonePublique.textContent = JSON.stringify(cles.publicKey, null, 2);
       zonePrivee.textContent = JSON.stringify(cles.privateKey, null, 2);
