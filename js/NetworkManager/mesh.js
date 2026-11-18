@@ -31,14 +31,19 @@
  *   mesh.on("peer-joined", id => {...});  // un voisin vient de se connecter
  *   mesh.on("peer-left",   id => {...});  // un voisin est parti
  *   mesh.on("mesh-ready",  info => {...}); // invité : relié à toute la PEER_LIST
- *   mesh.broadcast(message);              // envoi à tous les voisins
+ *   mesh.broadcast(message);              // envoi à tous les voisins (= router.broadcast)
+ *
+ * Les messages JOIN, PEER_LIST et PING respectent l'enveloppe de CONTRACTS.md et passent
+ * par le routeur (router.js, T1.5), qui valide les messages et appelle les gestionnaires.
  */
 
-// Types de messages gérés par le maillage (les autres messages sont ignorés ici)
+import { router as sharedRouter, MESSAGE_TYPES } from "./router.js";
+
+// Types de messages gérés par le maillage (les autres types sont traités par d'autres modules)
 export const MESH_MESSAGES = Object.freeze({
-    JOIN: "JOIN",
-    PEER_LIST: "PEER_LIST",
-    PING: "PING"
+    JOIN: MESSAGE_TYPES.JOIN,
+    PEER_LIST: MESSAGE_TYPES.PEER_LIST,
+    PING: MESSAGE_TYPES.PING
 });
 
 // Événements émis par le maillage
@@ -58,8 +63,10 @@ export class PeerMesh {
      * @param {object}  [options]
      * @param {boolean} [options.isHost]      true pour l'organisateur
      * @param {string}  [options.hostId]      Session ID de l'hôte (obligatoire pour un invité)
-     * @param {number}  [options.heartbeatMs] Période des PING (3 s par défaut)
-     * @param {number}  [options.timeoutMs]   Silence maximal avant de considérer un voisin parti (10 s)
+     * @param {string}  [options.role]        "voter" ou "organizer" (selon isHost par défaut)
+     * @param {object}  [options.router]      Routeur à utiliser (le routeur partagé par défaut)
+     * @param {number}  [options.heartbeatMs] Période des PING (5 s, comme CONTRACTS.md)
+     * @param {number}  [options.timeoutMs]   Silence maximal avant de considérer un voisin parti (15 s)
      */
     constructor(network, options = {}) {
 
@@ -73,9 +80,16 @@ export class PeerMesh {
 
         this.hostId = options.hostId ?? null;
 
-        this.heartbeatMs = options.heartbeatMs ?? 3000;
+        this.role = options.role ?? (this.isHost ? "organizer" : "voter");
 
-        this.timeoutMs = options.timeoutMs ?? 10000;
+        this.router = options.router ?? sharedRouter;
+
+        // Retirent les gestionnaires enregistrés dans le routeur
+        this.unregisterHandlers = [];
+
+        this.heartbeatMs = options.heartbeatMs ?? 5000;
+
+        this.timeoutMs = options.timeoutMs ?? 15000;
 
         this.listeners = {};
 
@@ -189,6 +203,15 @@ export class PeerMesh {
 
         this.started = true;
 
+        this.router.attach(this.network);
+
+        this.unregisterHandlers = [
+            this.router.registerHandler(MESH_MESSAGES.JOIN, (message, meta) => this._handleJoin(message, meta.from)),
+            this.router.registerHandler(MESH_MESSAGES.PEER_LIST, (message, meta) => this._handlePeerList(message, meta.from)),
+            // PING : rien à faire, _onData met déjà à jour lastSeen
+            this.router.registerHandler(MESH_MESSAGES.PING, () => {})
+        ];
+
         this.network.on("connection", this._onConnection);
         this.network.on("data", this._onData);
         this.network.on("close", this._onClose);
@@ -219,6 +242,10 @@ export class PeerMesh {
 
         this.timer = null;
 
+        this.unregisterHandlers.forEach(unregister => unregister());
+
+        this.unregisterHandlers = [];
+
         this.network.off("connection", this._onConnection);
         this.network.off("data", this._onData);
         this.network.off("close", this._onClose);
@@ -244,28 +271,11 @@ export class PeerMesh {
     }
 
 
-    // Envoyer un message à tous les voisins ; retourne le nombre de destinataires
+    // Envoyer un message (format CONTRACTS.md) à tous les voisins ; retourne le nombre de destinataires
+    // Raccourci vers router.broadcast()
     broadcast(message) {
 
-        let count = 0;
-
-        this.getPeers().forEach(peerId => {
-
-            try {
-
-                this.network.send(peerId, message);
-
-                count++;
-
-            } catch (error) {
-
-                console.error(error);
-
-            }
-
-        });
-
-        return count;
+        return this.router.broadcast(message);
     }
 
 
@@ -296,34 +306,12 @@ export class PeerMesh {
     }
 
 
-    // Un message est arrivé
-    _onData({ from, data }) {
-
-        if (!data || typeof data !== "object") {
-            return;
-        }
+    // Un message est arrivé : tout message prouve que le voisin est vivant.
+    // Le tri par type est fait par le routeur (router.js).
+    _onData({ from }) {
 
         if (this._isOpen(from)) {
             this.lastSeen.set(from, Date.now());
-        }
-
-        switch (data.type) {
-
-            case MESH_MESSAGES.JOIN:
-                this._handleJoin(from);
-                break;
-
-            case MESH_MESSAGES.PEER_LIST:
-                this._handlePeerList(from, data.peers);
-                break;
-
-            case MESH_MESSAGES.PING:
-                // Rien à faire : lastSeen est déjà mis à jour
-                break;
-
-            default:
-                // Message d'un autre module (vote, registre...) : ignoré ici
-                break;
         }
     }
 
@@ -341,61 +329,59 @@ export class PeerMesh {
 
         this.joinSent = true;
 
-        try {
+        const message = this.router.create(MESH_MESSAGES.JOIN, {
+            sessionId: this.hostId,
+            role: this.role
+        });
 
-            this.network.send(this.hostId, { type: MESH_MESSAGES.JOIN });
-
-        } catch (error) {
-
+        if (!this.router.sendTo(this.hostId, message)) {
             this.joinSent = false;
-
-            console.error(error);
-
         }
     }
 
 
-    // Hôte : répondre avec la liste des peers déjà inscrits
-    _handleJoin(from) {
+    // Hôte : répondre avec la liste des nœuds déjà présents
+    _handleJoin(message, from) {
 
         if (!this.isHost) {
             return;
         }
 
+        // Le JOIN doit viser notre session
+        if (message.payload.sessionId !== this.hostId) {
+
+            console.warn(`[mesh] JOIN ignoré de ${from} : mauvaise session`);
+
+            return;
+        }
+
         this._markJoined(from);
 
-        // Liste AVANT d'inscrire l'arrivant : il ne figure pas dans sa propre liste
-        const peers = [...this.members].filter(
-            peerId => peerId !== from && this._isOpen(peerId)
-        );
+        // Liste AVANT d'inscrire l'arrivant : il ne figure pas dans sa propre liste.
+        // L'hôte en fait partie (« nœuds déjà présents », CONTRACTS.md 4.2).
+        const peers = [
+            this.hostId,
+            ...[...this.members].filter(peerId => peerId !== from && this._isOpen(peerId))
+        ];
 
         this.members.add(from);
 
-        try {
+        const reply = this.router.create(MESH_MESSAGES.PEER_LIST, { peers });
 
-            this.network.send(from, {
-                type: MESH_MESSAGES.PEER_LIST,
-                peers
-            });
-
-        } catch (error) {
-
+        if (!this.router.sendTo(from, reply)) {
             this.members.delete(from);
-
-            console.error(error);
-
         }
     }
 
 
     // Invité : se connecter à tous les peers de la liste
-    _handlePeerList(from, peers) {
+    _handlePeerList(message, from) {
 
-        if (this.isHost || from !== this.hostId || !Array.isArray(peers)) {
+        if (this.isHost || from !== this.hostId) {
             return;
         }
 
-        this._connectToPeers(peers);
+        this._connectToPeers(message.payload.peers);
     }
 
 
@@ -582,15 +568,8 @@ export class PeerMesh {
                 return;
             }
 
-            try {
-
-                this.network.send(peerId, { type: MESH_MESSAGES.PING });
-
-            } catch (error) {
-
-                // Connexion en cours de fermeture : le prochain tour la retirera
-
-            }
+            // Si l'envoi échoue (connexion en cours de fermeture), le prochain tour la retirera
+            this.router.sendTo(peerId, this.router.create(MESH_MESSAGES.PING));
 
         });
     }

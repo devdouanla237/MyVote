@@ -4,6 +4,8 @@ import NetworkManager from "./network.js";
 export let network = new NetworkManager();
 
 
+
+
 // État de l'organisateur
 export let isHost = false;
 

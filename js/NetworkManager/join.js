@@ -61,6 +61,7 @@ export class JoinError extends Error {
 
 let sharedNetwork = null;
 
+
 /**
  * Indique quelle instance de NetworkManager utiliser.
  * À appeler UNE FOIS au démarrage de l'application, avant `joinSession`.

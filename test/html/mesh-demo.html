@@ -26,9 +26,7 @@
 </style>
 
 <!-- Si tu utilises un bundler (Vite...), supprime cet importmap : "peerjs" sera résolu par le bundler -->
-<script type="importmap">
-{ "imports": { "peerjs": "https://esm.sh/peerjs@1.5.4" } }
-</script>
+
 </head>
 <body>
 <main>
@@ -50,7 +48,8 @@
       <strong>Voisins : <span id="count">0</span></strong>
       <ul id="peers"></ul>
       <div class="row" style="margin-top:12px">
-        <button id="ping" class="alt" disabled>Broadcast « salut »</button>
+        <button id="ping" class="alt" disabled>Diffuser un BALLOT_BLOCK (test)</button>
+        <button id="bad" class="alt" disabled>Envoyer un message invalide (test)</button>
       </div>
     </section>
     <section class="card">
@@ -61,12 +60,21 @@
 </main>
 
 <script type="module">
-  import { network, hostSession } from "../../js/NetworkManager/host.js";
+    import { network, hostSession } from "../../js/NetworkManager/host.js";
   import { joinSession, setNetworkManager } from "../../js/NetworkManager/join.js";
   import { startMesh, stopMesh } from "../../js/NetworkManager/mesh.js";
 
+  import { router } from "../../js/NetworkManager/router.js";
+
   const $ = (id) => document.getElementById(id);
   let mesh = null;
+  let received = 0;
+
+  // T1.5 : le routeur appelle ce gestionnaire pour chaque BALLOT_BLOCK valide (une seule fois par message)
+  router.registerHandler("BALLOT_BLOCK", (message, { from }) => {
+    received++;
+    log("BALLOT_BLOCK #" + received + " reçu de " + short(from) + " (id " + message.id + ")");
+  });
 
   const log = (txt, cls = "") => {
     const d = document.createElement("div");
@@ -92,11 +100,8 @@
     m.on("peer-joined", (id) => { log("peer-joined " + short(id), "j"); render(); });
     m.on("peer-left",   (id) => { log("peer-left "   + short(id), "l"); render(); });
     m.on("mesh-ready",  (i)  => { log("mesh-ready : " + i.peers.length + " voisin(s)" + (i.failed.length ? ", échecs : " + i.failed.length : "")); render(); });
-    network.on("data", ({ from, data }) => {
-      if (data && data.demo) log("message de " + short(from) + " : " + data.demo);
-    });
     $("host").disabled = $("join").disabled = true;
-    $("leave").disabled = $("ping").disabled = false;
+    $("leave").disabled = $("ping").disabled = $("bad").disabled = false;
     $("me").textContent = network.getPeerId();
     setStatus("en ligne", "on");
     render();
@@ -136,18 +141,40 @@
     }
   };
 
+  // Diffuse un BALLOT_BLOCK factice : chaque autre onglet doit le recevoir UNE fois
   $("ping").onclick = () => {
-    const n = mesh.broadcast({ demo: "salut de " + short(network.getPeerId()) });
-    log("envoyé à " + n + " voisin(s)");
+    const block = {
+      index: 0,
+      tokenHash: "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae",
+      encryptedBallot: "Qk1Wb3RlRXhhbXBsZUNpcGhlcnRleHQ=",
+      prevHash: "GENESIS",
+      timestamp: Date.now(),
+      receiptHash: "A1B2C3D4E5F6G7H8"
+    };
+    const n = router.broadcast(router.create("BALLOT_BLOCK", { block }));
+    log("BALLOT_BLOCK envoyé à " + n + " voisin(s)");
+  };
+
+  // Envoie des messages invalides en contournant le routeur : les autres onglets doivent
+  // les rejeter avec un avertissement dans la console (F12), sans planter
+  $("bad").onclick = () => {
+    const invalids = [
+      "{ ceci n'est pas du JSON",
+      { id: "3f9a1c07b2d4", type: "TYPE_INCONNU", from: "x", timestamp: 1, payload: {} },
+      { type: "BALLOT_BLOCK" }
+    ];
+    mesh.getPeers().forEach((peerId) => invalids.forEach((m) => network.send(peerId, m)));
+    log("3 messages invalides envoyés à chaque voisin : voir la console des autres onglets");
   };
 
   $("leave").onclick = () => {
     stopMesh();
+    router.detach();
     network.destroy();
     mesh = null;
     render();
     setStatus("nœud fermé (recharge la page pour recommencer)", "err");
-    $("leave").disabled = $("ping").disabled = true;
+    $("leave").disabled = $("ping").disabled = $("bad").disabled = true;
   };
 
   window.addEventListener("beforeunload", () => network.destroy());
