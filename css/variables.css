@@ -1,26 +1,64 @@
+@import url("./variables.css");
+
 :root {
---primary: #1D4ED8;
---accent: #0D9488;
---bg: #F8FAFC;
---surface: #FFFFFF;
---text: #0F172A;
---text-muted: #475569;
---border: #E2E8F0;
---success: #16A34A;
---warning: #D97706;
---danger: #DC2626;
---info: #0284C7;
+--bg: #F6F7FB;
+  --surface: #FFFFFF;
+  --hover: #F8F8FF;
+  --text: #111827;
+  --muted: #5B6477;
+  --border: #E3E6EF;
+
+  --primary: #4F46E5;
+  --on-primary: #FFFFFF;
+  --primary-soft: #EEF0FF;
+
+  --accent: #0D9488;
+  --on-accent: #FFFFFF;
+  --accent-soft: #E3F6F3;
+
+  --success: #16A34A;
+  --success-soft: #E8F7EE;
+  --warning: #D97706;
+  --warning-soft: #FEF3E2;
+  --danger: #DC2626;
+  --danger-soft: #FDECEC;
+
+  --shadow-card: 0 2px 8px rgb(0 0 0 / .06);
+  --shadow-hover-org: 0 14px 32px -4px rgb(79 70 229 / .20);
+  --shadow-hover-voter: 0 14px 32px -4px rgb(13 148 136 / .20);
+  --ring-org: 0 0 0 4px rgb(79 70 229 / .40);
+  --ring-voter: 0 0 0 4px rgb(13 148 136 / .40);
 }
 :root[data-theme="dark"] {
---primary: #60A5FA;
---accent: #2DD4BF;
---bg: #0F172A;
---surface: #1E293B;
---text: #E2E8F0;
---text-muted: #94A3B8;
---border: #334155;
---success: #4ADE80;
---warning: #FBBF24;
---danger: #F87171;
---info: #38BDF8;
+--bg: #0E1220;
+  --surface: #171C2E;
+  --hover: #1D2344;
+  --text: #F3F4F8;
+  --muted: #A3ABBE;
+  --border: #2A3150;
+
+  --primary: #8B8DFF;
+  --on-primary: #0E1220;
+  --primary-soft: #242A52;
+
+  --accent: #2DD4BF;
+  --on-accent: #06201E;
+  --accent-soft: #0F2E2D;
+
+  --success: #4ADE80;
+  --success-soft: #12301F;
+  --warning: #FBBF24;
+  --warning-soft: #33290F;
+  --danger: #F87171;
+  --danger-soft: #35181B;
+
+  --shadow-card: 0 2px 8px rgb(0 0 0 / .35);
+  --shadow-hover-org: 0 14px 32px -4px rgb(139 141 255 / .30);
+  --shadow-hover-voter: 0 14px 32px -4px rgb(45 212 191 / .30);
+  --ring-org: 0 0 0 4px rgb(139 141 255 / .40);
+  --ring-voter: 0 0 0 4px rgb(45 212 191 / .40);
+
+  --radius-card: 24px;
+  --radius-btn: 14px;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
