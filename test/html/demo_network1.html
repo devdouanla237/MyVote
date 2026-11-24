@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Test réseau P2P — T1.1 à T1.7</title>
+
+    <style>
+
+        :root {
+            --bg: #f6f7fb;
+            --surface: #ffffff;
+            --text: #111827;
+            --muted: #5b6477;
+            --border: #e3e6ef;
+            --primary: #4f46e5;
+            --on-primary: #ffffff;
+            --ok: #16a34a;
+            --warn: #d97706;
+            --bad: #dc2626;
+            --send: #4f46e5;
+            --recv: #0d9488;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0e1220;
+                --surface: #171c2e;
+                --text: #f3f4f8;
+                --muted: #a3abbe;
+                --border: #2a3150;
+                --primary: #8b8dff;
+                --on-primary: #0e1220;
+                --ok: #4ade80;
+                --warn: #fbbf24;
+                --bad: #f87171;
+                --send: #8b8dff;
+                --recv: #2dd4bf;
+            }
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 16px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.45;
+        }
+
+        h1 { margin: 0 0 4px; font-size: 1.4rem; }
+        h2 { margin: 0 0 10px; font-size: 1.05rem; }
+
+        .hint { color: var(--muted); font-size: .85rem; margin: 0 0 14px; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 14px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .wide { grid-column: 1 / -1; }
+
+        .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+
+        label { font-size: .85rem; color: var(--muted); }
+
+        input[type="text"], input[type="number"], select {
+            padding: 7px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            font: inherit;
+        }
+
+        input[type="number"] { width: 70px; }
+
+        #sessionId {
+            width: 130px;
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            letter-spacing: .08em;
+        }
+
+        button {
+            padding: 7px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+            color: var(--text);
+            font: inherit;
+            cursor: pointer;
+        }
+
+        button:hover:not(:disabled) { border-color: var(--primary); }
+
+        button.primary {
+            background: var(--primary);
+            color: var(--on-primary);
+            border-color: var(--primary);
+        }
+
+        button:disabled { opacity: .45; cursor: not-allowed; }
+
+        .status { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); }
+        .dot.ok { background: var(--ok); }
+        .dot.wait { background: var(--warn); }
+        .dot.bad { background: var(--bad); }
+
+        .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85rem; }
+
+        table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+
+        th, td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--border); }
+
+        th { color: var(--muted); font-weight: 600; }
+
+        .tag {
+            font-size: .7rem;
+            padding: 1px 6px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        .scroll { max-height: 220px; overflow: auto; }
+
+        #logs {
+            height: 340px;
+            overflow: auto;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            font-size: .8rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .line.ok { color: var(--ok); }
+        .line.warn { color: var(--warn); }
+        .line.error { color: var(--bad); }
+        .line.send { color: var(--send); }
+        .line.recv { color: var(--recv); }
+        .line.info { color: var(--muted); }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Test réseau P2P — T1.1 à T1.7</h1>
+
+    <p class="hint">
+        Ouvre cette page dans 3 onglets : un organisateur, puis deux électeurs avec le même Session ID.
+        Le réseau PeerJS est celui de <code>host.js</code> (instance partagée).
+    </p>
+
+    <div class="grid">
+
+        <!-- ============================================================ SESSION -->
+        <section class="card">
+
+            <h2>1. Session</h2>
+
+            <div class="row">
+
+                <label><input type="radio" name="role" value="host" checked> Organisateur (hôte)</label>
+
+                <label><input type="radio" name="role" value="voter"> Électeur</label>
+
+            </div>
+
+            <div class="row">
+
+                <label for="sessionId">Session ID</label>
+
+                <input type="text" id="sessionId" maxlength="8" placeholder="TEST1234" autocomplete="off">
+
+                <button id="generate" type="button">Générer</button>
+
+                <button id="copy" type="button">Copier</button>
+
+            </div>
+
+            <div class="row">
+
+                <label>PING toutes les <input type="number" id="heartbeat" value="5" min="1"> s</label>
+
+                <label>silence max <input type="number" id="timeout" value="10" min="2"> s</label>
+
+            </div>
+
+            <div class="row">
+
+                <button id="start" class="primary" type="button">Héberger</button>
+
+                <button id="quit" type="button">Quitter (recharge la page)</button>
+
+            </div>
+
+            <div class="row">
+
+                <span class="status"><span class="dot" id="dot"></span><span id="statusText">Non démarré</span></span>
+
+            </div>
+
+            <div class="mono">Mon ID : <strong id="myId">—</strong></div>
+
+        </section>
+
+        <!-- ============================================================== PAIRS -->
+        <section class="card">
+
+            <h2>2. Voisins connectés (<span id="peerCount">0</span>)</h2>
+
+            <div class="scroll">
+
+                <table>
+
+                    <thead>
+                        <tr><th>Pair</th><th></th><th></th></tr>
+                    </thead>
+
+                    <tbody id="peers">
+                        <tr><td colspan="3" class="hint">Aucun voisin.</td></tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <p class="hint">« Fermer » coupe la connexion : le reconnecteur (T1.6) tente alors 3 fois de la rétablir.</p>
+
+        </section>
+
+        <!-- ============================================================ MESSAGES -->
+        <section class="card">
+
+            <h2>3. Messages (T1.5)</h2>
+
+            <div class="row">
+
+                <label for="target">Destinataire</label>
+
+                <select id="target">
+                    <option value="all">Tous les voisins</option>
+                </select>
+
+            </div>
+
+            <div class="row">
+
+                <button id="vote" type="button" disabled>Vote factice (BALLOT_BLOCK)</button>
+
+                <button id="voteTwice" type="button" disabled>Même vote envoyé 2 fois</button>
+
+            </div>
+
+            <div class="row">
+
+                <button id="badJson" type="button" disabled>JSON invalide</button>
+
+                <button id="badType" type="button" disabled>Type inconnu</button>
+
+                <button id="noPayload" type="button" disabled>Sans payload</button>
+
+            </div>
+
+            <div class="row">
+
+                <label><input type="checkbox" id="relay" checked> Rediffuser les blocs reçus (une fois)</label>
+
+            </div>
+
+            <p class="hint">
+                Les 3 derniers boutons envoient des messages défectueux : le récepteur doit les rejeter
+                dans son journal sans planter. Le doublon ne doit être traité qu'une fois.
+            </p>
+
+        </section>
+
+        <!-- ============================================================ REGISTRE -->
+        <section class="card">
+
+            <h2>4. Registre simulé (T1.7) : <span id="ledgerLength">0</span> bloc(s)</h2>
+
+            <div class="row">
+
+                <label>Ajouter <input type="number" id="fillCount" value="10" min="1" max="500"> blocs factices</label>
+
+                <button id="fill" type="button">Ajouter</button>
+
+            </div>
+
+            <div class="row">
+
+                <button id="syncNow" type="button" disabled>Demander la synchro au pair choisi</button>
+
+            </div>
+
+            <div class="scroll">
+
+                <table>
+
+                    <thead>
+                        <tr><th>#</th><th>tokenHash</th><th>prevHash</th><th>reçu</th></tr>
+                    </thead>
+
+                    <tbody id="ledgerRows"></tbody>
+
+                </table>
+
+            </div>
+
+            <p class="hint">
+                Astuce : sur l'hôte, ajoute 25 blocs, puis fais rejoindre un électeur : il doit les recevoir
+                en 2 lots (20 + 5). Seuls les 50 derniers blocs sont affichés.
+            </p>
+
+        </section>
+
+        <!-- ============================================================== JOURNAL -->
+        <section class="card wide">
+
+            <h2>5. Journal</h2>
+
+            <div class="row">
+
+                <label><input type="checkbox" id="showPing"> Afficher les PING</label>
+
+                <label><input type="checkbox" id="autoscroll" checked> Défilement automatique</label>
+
+                <button id="clearLogs" type="button">Vider</button>
+
+            </div>
+
+            <div id="logs"></div>
+
+        </section>
+
+    </div>
+
+    <!--
+        Les modules sont supposés dans js/NetworkManager/ (comme la page précédente).
+        network.js importe "peerjs" : sers la page avec ton serveur de développement
+        (Vite, etc.), comme pour l'ancienne page de test.
+    -->
+    <script type="module">
+
+        import { network, hostSession } from "../../js/NetworkManager/host.js";
+        import { setNetworkManager, joinSession } from "../../js/NetworkManager/join.js";
+        import { router, MESSAGE_TYPES } from "../../js/NetworkManager/router.js";
+        import { startMesh } from "../../js/NetworkManager/mesh.js";
+        import { startReconnect } from "../../js/NetworkManager/reconnect.js";
+        import { startSync, createMockLedger } from "../../js/NetworkManager/sync.js";
+
+
+        // ================================================================
+        // Outils
+        // ================================================================
+
+        const $ = id => document.getElementById(id);
+
+        const logsBox = $("logs");
+
+        function log(kind, text) {
+
+            const line = document.createElement("div");
+
+            line.className = "line " + kind;
+
+            line.textContent = `${new Date().toLocaleTimeString("fr-FR")}  ${text}`;
+
+            logsBox.appendChild(line);
+
+            if ($("autoscroll").checked) {
+                logsBox.scrollTop = logsBox.scrollHeight;
+            }
+        }
+
+        // Les avertissements et erreurs de la console (routeur, maillage…) apparaissent aussi ici
+        const textOf = args => args
+            .map(item => (item instanceof Error ? item.message : String(item)))
+            .join(" ");
+
+        const rawWarn = console.warn.bind(console);
+        const rawError = console.error.bind(console);
+
+        console.warn = (...args) => { rawWarn(...args); log("warn", textOf(args)); };
+        console.error = (...args) => { rawError(...args); log("error", textOf(args)); };
+
+        const hex = length =>
+            Array.from(
+                crypto.getRandomValues(new Uint8Array(length / 2)),
+                byte => byte.toString(16).padStart(2, "0")
+            ).join("");
+
+        function setStatus(text, kind) {
+
+            $("statusText").textContent = text;
+
+            $("dot").className = "dot " + (kind || "");
+        }
+
+
+        // ================================================================
+        // État
+        // ================================================================
+
+        const ledger = createMockLedger(0);
+
+        let role = "host";
+        let mesh = null;
+        let sync = null;
+        let reconnector = null;
+
+        function makeBlock() {
+
+            const index = ledger.getLength();
+
+            return {
+                index,
+                tokenHash: hex(64),
+                encryptedBallot: "Qk1Wb3RlRXhhbXBsZUNpcGhlcnRleHQ=",
+                prevHash: index === 0 ? "GENESIS" : hex(64),
+                timestamp: Date.now(),
+                receiptHash: hex(16).toUpperCase()
+            };
+        }
+
+
+        // ================================================================
+        // Événements du réseau (T1.1)
+        // ================================================================
+
+        network.on("open", id => {
+            $("myId").textContent = id;
+            log("ok", `OPEN : ${id}`);
+        });
+
+        network.on("connection", peerId => log("info", `CONNECTION : ${peerId}`));
+
+        network.on("close", peerId => log("info", `CLOSE : ${peerId}`));
+
+        network.on("error", error => log("error", `ERROR : ${error.type ?? ""} ${error.message ?? ""}`));
+
+
+        // ================================================================
+        // Journal des messages reçus (routeur, T1.5)
+        // ================================================================
+
+        function summarize(message) {
+
+            const p = message.payload;
+
+            switch (message.type) {
+
+                case "JOIN": return `role=${p.role}`;
+                case "PEER_LIST": return `${p.peers.length} pair(s) : ${p.peers.join(", ")}`;
+                case "LEDGER_REQUEST": return `fromIndex=${p.fromIndex}`;
+                case "LEDGER_SYNC": return `fromIndex=${p.fromIndex}, ${p.blocks.length} bloc(s), isLast=${p.isLast}`;
+                case "CLOSE_ELECTION": return `finalLength=${p.finalLength}`;
+                case "REJECT": return `${p.reason} (bloc ${p.blockIndex})`;
+                case "RESULT_HASH": return `${p.resultHash.slice(0, 12)}… (${p.ledgerLength} blocs)`;
+                default: return "";
+            }
+        }
+
+        Object.values(MESSAGE_TYPES)
+            .filter(type => type !== "BALLOT_BLOCK")
+            .forEach(type => {
+
+                router.registerHandler(type, (message, meta) => {
+
+                    if (type === "PING" && !$("showPing").checked) {
+                        return;
+                    }
+
+                    log("recv", `← ${type} de ${meta.from} ${summarize(message)}`);
+                });
+
+            });
+
+        // BALLOT_BLOCK : ajout au registre + rediffusion unique (le routeur ignore les doublons)
+        router.registerHandler("BALLOT_BLOCK", (message, meta) => {
+
+            const block = message.payload.block;
+
+            const length = ledger.getLength();
+
+            if (block.index === length) {
+
+                try {
+
+                    ledger.appendBlock(block);
+
+                    log("recv", `← BALLOT_BLOCK #${block.index} de ${meta.from} : ajouté au registre`);
+
+                } catch (error) {
+
+                    log("error", `BALLOT_BLOCK #${block.index} refusé : ${error.message}`);
+
+                    return;
+                }
+
+                if ($("relay").checked && mesh) {
+                    router.broadcast(message, { exclude: [meta.from] });
+                }
+
+            } else if (block.index > length) {
+
+                log("warn", `BALLOT_BLOCK #${block.index} reçu mais le registre n'a que ${length} bloc(s) (trou)`);
+
+            } else {
+
+                log("warn", `BALLOT_BLOCK #${block.index} déjà présent (ignoré)`);
+            }
+
+            renderLedger();
+        });
+
+
+        // ================================================================
+        // Démarrage : hôte ou électeur
+        // ================================================================
+
+        function attachModules() {
+
+            mesh.on("peer-joined", id => { log("ok", `peer-joined : ${id}`); renderPeers(true); });
+
+            mesh.on("peer-left", id => { log("warn", `peer-left : ${id}`); renderPeers(true); });
+
+            mesh.on("mesh-ready", info => {
+
+                log(
+                    "ok",
+                    `mesh-ready : ${info.peers.length} pair(s)` +
+                    (info.failed.length ? `, injoignables : ${info.failed.join(", ")}` : "")
+                );
+
+                renderPeers(true);
+            });
+
+            // T1.6 : reconnexion automatique
+            reconnector = startReconnect(mesh);
+
+            reconnector.on("reconnecting", ({ peerId, attempt, max }) =>
+                log("warn", `reconnecting : ${peerId} (tentative ${attempt}/${max})`));
+
+            reconnector.on("reconnected", ({ peerId, attempt, incoming }) => {
+
+                log("ok", `reconnected : ${peerId} (tentative ${attempt}, ${incoming ? "il nous a reconnectés" : "nous l'avons reconnecté"})`);
+
+                // T1.7 : après une reconnexion, récupérer les blocs manquants
+                sync.requestSync(peerId).catch(() => {});
+
+                renderPeers(true);
+            });
+
+            reconnector.on("reconnect-failed", ({ peerId, attempts }) =>
+                log("error", `reconnect-failed : ${peerId} après ${attempts} tentatives`));
+
+            // T1.7 : synchronisation du registre (automatique pour un électeur)
+            sync = startSync(role === "host" ? { ledger } : { ledger, mesh });
+
+            sync.on("synced", ({ from, length }) => {
+                log("ok", `synced : registre à jour depuis ${from} (${length} bloc(s))`);
+                renderLedger();
+            });
+
+            sync.on("sync-failed", ({ from, error }) =>
+                log("error", `sync-failed : ${from} — ${error.message}`));
+
+            ["vote", "voteTwice", "badJson", "badType", "noPayload", "syncNow"].forEach(id => {
+                $(id).disabled = false;
+            });
+
+            renderPeers(true);
+            renderLedger();
+        }
+
+        $("start").addEventListener("click", async () => {
+
+            role = document.querySelector('input[name="role"]:checked').value;
+
+            const sessionId = $("sessionId").value.trim();
+
+            const heartbeatMs = Math.max(1, Number($("heartbeat").value)) * 1000;
+            const timeoutMs = Math.max(2, Number($("timeout").value)) * 1000;
+
+            $("start").disabled = true;
+
+            setStatus("Connexion…", "wait");
+
+            try {
+
+                if (role === "host") {
+
+                    await hostSession(sessionId);
+
+                    mesh = startMesh(network, { isHost: true, heartbeatMs, timeoutMs });
+
+                    log("ok", `Hôte prêt : ${sessionId}`);
+
+                    setStatus("Hôte actif", "ok");
+
+                } else {
+
+                    setNetworkManager(network);
+
+                    const hostId = await joinSession(sessionId);
+
+                    mesh = startMesh(network, { hostId, heartbeatMs, timeoutMs });
+
+                    log("ok", `Connecté à l'hôte ${hostId}`);
+
+                    setStatus("Électeur connecté", "ok");
+                }
+
+                // Pas d'attente ici : les modules doivent écouter avant « mesh-ready »
+                attachModules();
+
+            } catch (error) {
+
+                log("error", `${error.code ?? error.name} : ${error.message}`);
+
+                setStatus("Erreur", "bad");
+
+                if (role === "host") {
+                    log("warn", "Le réseau a été détruit après l'échec : recharge la page pour réessayer.");
+                } else {
+                    $("start").disabled = false;
+                }
+            }
+        });
+
+        $("quit").addEventListener("click", () => location.reload());
+
+        $("generate").addEventListener("click", () => {
+            $("sessionId").value = hex(8).toUpperCase();
+        });
+
+        $("copy").addEventListener("click", async () => {
+
+            try {
+
+                await navigator.clipboard.writeText($("sessionId").value);
+
+                log("info", "Session ID copié.");
+
+            } catch (error) {
+
+                log("warn", "Copie impossible : " + error.message);
+            }
+        });
+
+        $("sessionId").addEventListener("input", event => {
+            event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+        });
+
+        document.querySelectorAll('input[name="role"]').forEach(radio => {
+
+            radio.addEventListener("change", () => {
+                $("start").textContent = radio.value === "host" ? "Héberger" : "Rejoindre";
+            });
+
+        });
+
+
+        // ================================================================
+        // Voisins
+        // ================================================================
+
+        let lastPeersKey = null;
+
+        function renderPeers(force = false) {
+
+            if (!mesh) {
+                return;
+            }
+
+            const peers = mesh.getPeers();
+
+            const key = peers.join("|");
+
+            $("peerCount").textContent = peers.length;
+
+            if (!force && key === lastPeersKey) {
+                return;
+            }
+
+            lastPeersKey = key;
+
+            const tbody = $("peers");
+
+            tbody.replaceChildren();
+
+            if (peers.length === 0) {
+
+                const tr = document.createElement("tr");
+
+                tr.innerHTML = '<td colspan="3" class="hint">Aucun voisin.</td>';
+
+                tbody.appendChild(tr);
+
+            }
+
+            peers.forEach(peerId => {
+
+                const tr = document.createElement("tr");
+
+                const id = document.createElement("td");
+                id.className = "mono";
+                id.textContent = peerId;
+
+                const tag = document.createElement("td");
+                if (peerId === mesh.hostId) {
+                    tag.innerHTML = '<span class="tag">hôte</span>';
+                }
+
+                const action = document.createElement("td");
+                const button = document.createElement("button");
+                button.textContent = "Fermer";
+                button.addEventListener("click", () => {
+
+                    const conn = network.connections[peerId];
+
+                    if (conn) {
+                        log("warn", `Fermeture manuelle de la connexion avec ${peerId}`);
+                        conn.close();
+                    }
+                });
+                action.appendChild(button);
+
+                tr.append(id, tag, action);
+
+                tbody.appendChild(tr);
+            });
+
+            // Liste des destinataires
+            const select = $("target");
+
+            const previous = select.value;
+
+            select.replaceChildren(new Option("Tous les voisins", "all"));
+
+            peers.forEach(peerId => select.appendChild(new Option(peerId, peerId)));
+
+            select.value = peers.includes(previous) ? previous : "all";
+
+            setStatus(
+                role === "host" ? "Hôte actif" : "Électeur connecté",
+                peers.length > 0 ? "ok" : "wait"
+            );
+        }
+
+
+        // ================================================================
+        // Registre
+        // ================================================================
+
+        function renderLedger() {
+
+            $("ledgerLength").textContent = ledger.getLength();
+
+            const tbody = $("ledgerRows");
+
+            tbody.replaceChildren();
+
+            ledger.getBlocks().slice(-50).forEach(block => {
+
+                const tr = document.createElement("tr");
+
+                tr.className = "mono";
+
+                [
+                    block.index,
+                    block.tokenHash.slice(0, 10) + "…",
+                    block.prevHash === "GENESIS" ? "GENESIS" : block.prevHash.slice(0, 10) + "…",
+                    block.receiptHash
+                ].forEach(value => {
+
+                    const td = document.createElement("td");
+
+                    td.textContent = value;
+
+                    tr.appendChild(td);
+                });
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        $("fill").addEventListener("click", () => {
+
+            const count = Math.min(500, Math.max(1, Number($("fillCount").value) || 1));
+
+            for (let i = 0; i < count; i++) {
+                ledger.appendBlock(makeBlock());
+            }
+
+            log("info", `${count} bloc(s) factice(s) ajouté(s) localement (registre : ${ledger.getLength()})`);
+
+            renderLedger();
+        });
+
+        $("syncNow").addEventListener("click", async () => {
+
+            const target = $("target").value;
+
+            const peerId = target === "all" ? mesh.getPeers()[0] : target;
+
+            if (!peerId) {
+                log("warn", "Aucun voisin à interroger.");
+                return;
+            }
+
+            log("send", `→ LEDGER_REQUEST à ${peerId} (fromIndex=${ledger.getLength()})`);
+
+            try {
+
+                await sync.requestSync(peerId);
+
+            } catch (error) {
+
+                // sync-failed est déjà journalisé ; on signale seulement le refus immédiat
+                if (!/Délai|connexion/.test(error.message)) {
+                    log("warn", error.message);
+                }
+            }
+
+            renderLedger();
+        });
+
+
+        // ================================================================
+        // Envoi de messages de test
+        // ================================================================
+
+        function targets() {
+
+            const target = $("target").value;
+
+            return target === "all" ? mesh.getPeers() : [target];
+        }
+
+        function sendRaw(label, payload) {
+
+            const peers = targets();
+
+            if (peers.length === 0) {
+                log("warn", "Aucun voisin.");
+                return;
+            }
+
+            peers.forEach(peerId => {
+
+                try {
+
+                    network.send(peerId, payload);
+
+                    log("send", `→ ${label} envoyé à ${peerId}`);
+
+                } catch (error) {
+
+                    log("error", error.message);
+                }
+            });
+        }
+
+        // Vote factice : ajouté au registre local puis diffusé
+        function castVote() {
+
+            const block = makeBlock();
+
+            ledger.appendBlock(block);
+
+            const message = router.create("BALLOT_BLOCK", { block });
+
+            renderLedger();
+
+            return message;
+        }
+
+        $("vote").addEventListener("click", () => {
+
+            const message = castVote();
+
+            const count = router.broadcast(message);
+
+            log("send", `→ BALLOT_BLOCK #${message.payload.block.index} diffusé à ${count} voisin(s)`);
+        });
+
+        $("voteTwice").addEventListener("click", () => {
+
+            const message = castVote();
+
+            const first = router.broadcast(message);
+
+            const second = router.broadcast(message);
+
+            log("send", `→ BALLOT_BLOCK #${message.payload.block.index} envoyé 2 fois (${first} + ${second} envois) : chaque voisin ne doit le traiter qu'une fois`);
+        });
+
+        $("badJson").addEventListener("click", () => sendRaw("JSON invalide", "{pas du json"));
+
+        $("badType").addEventListener("click", () => sendRaw("type inconnu", {
+            id: hex(12),
+            type: "HACK",
+            from: network.getPeerId(),
+            timestamp: Date.now(),
+            payload: {}
+        }));
+
+        $("noPayload").addEventListener("click", () => sendRaw("message sans payload", {
+            id: hex(12),
+            type: "BALLOT_BLOCK",
+            from: network.getPeerId(),
+            timestamp: Date.now()
+        }));
+
+        $("clearLogs").addEventListener("click", () => logsBox.replaceChildren());
+
+
+        // ================================================================
+        // Rafraîchissement régulier
+        // ================================================================
+
+        setInterval(() => {
+
+            renderPeers();
+
+            $("ledgerLength").textContent = ledger.getLength();
+
+        }, 1000);
+
+        log("info", "Page prête. Choisis un rôle, un Session ID, puis démarre.");
+
+    </script>
+
+</body>
+
+</html>
