@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#4f46e5">
+  <title>Connexion et salle d’attente — MyVote</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/waiting-room.css">
+  <!-- Résout l'import bare "peerjs" utilisé par NetworkManager dans le navigateur. -->
+  <script type="importmap">
+    { "imports": { "peerjs": "https://esm.sh/peerjs@1.5.5" } }
+  </script>
+  <script type="module" src="js/waiting-room.js"></script>
+</head>
+<body>
+  <main class="waiting-shell">
+    <header class="page-header">
+      <a class="brand" href="index.html" aria-label="Retour à l'accueil MyVote"><span class="brand-mark">M</span><span>MyVote</span></a>
+      <span class="secure-label"><span class="secure-dot"></span> Connexion P2P</span>
+    </header>
+
+    <section class="waiting-card" aria-labelledby="page-title">
+      <div class="eyebrow">PARTICIPATION AU SCRUTIN</div>
+      <h1 id="page-title">Connexion et salle d’attente</h1>
+      <p class="intro">Nous préparons votre connexion et vérifions que les participants disposent des informations nécessaires avant le vote.</p>
+
+      <form id="connection-form" class="connection-form">
+        <div class="form-grid">
+          <label class="field"><span>Votre rôle</span>
+            <select id="role" name="role">
+              <option value="voter">Électeur</option>
+              <option value="host">Organisateur / hôte</option>
+            </select>
+          </label>
+          <label class="field"><span>Identifiant de session</span>
+            <input id="session-id" name="sessionId" type="text" maxlength="8" minlength="8" placeholder="AB12CD34" autocomplete="off" required>
+            <small>8 lettres majuscules ou chiffres.</small>
+          </label>
+        </div>
+        <button class="button button-primary" id="connect-button" type="submit">Se connecter</button>
+      </form>
+
+      <div class="session-strip" id="session-strip" hidden>
+        <div><span class="strip-label">SESSION</span><strong id="session-value">—</strong></div>
+        <div><span class="strip-label">VOTRE IDENTIFIANT P2P</span><strong id="peer-value">En attente…</strong></div>
+      </div>
+
+      <section class="steps" aria-label="Étapes de connexion">
+        <article class="step" id="step-host" data-state="pending">
+          <div class="step-icon"><span>1</span></div>
+          <div class="step-content"><div class="step-heading"><h2>Connexion à l’hôte</h2><span class="step-status">En attente</span></div><p>Établissement de la connexion avec l’organisateur du scrutin.</p></div>
+        </article>
+        <article class="step" id="step-mesh" data-state="pending">
+          <div class="step-icon"><span>2</span></div>
+          <div class="step-content"><div class="step-heading"><h2>Maillage avec les pairs</h2><span class="step-status">En attente</span></div><p>Découverte et connexion aux autres participants du réseau.</p><div class="peer-count"><strong id="peer-count">0</strong> pair(s) connecté(s)</div><div id="mesh-note" class="step-note" aria-live="polite">Le maillage n’a pas encore démarré.</div></div>
+        </article>
+        <article class="step" id="step-ledger" data-state="pending">
+          <div class="step-icon"><span>3</span></div>
+          <div class="step-content"><div class="step-heading"><h2>Synchronisation du registre</h2><span class="step-status">En attente</span></div><p>Synchronisation des données du scrutin avec le registre distribué.</p><div class="progress-track" role="progressbar" aria-label="Progression de la synchronisation" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="sync-progress"></div></div><div class="progress-caption"><span id="sync-label">En attente du registre…</span><strong id="sync-percent">0 %</strong></div></div>
+        </article>
+      </section>
+
+      <div id="global-message" class="global-message" role="status" aria-live="polite">Renseignez l’identifiant de session pour commencer.</div>
+      <div class="action-row">
+        <button class="button button-quiet" id="retry-button" type="button" hidden>Réessayer le maillage</button>
+        <div class="action-spacer"></div>
+        <button class="button button-outline" id="cancel-button" type="button">Annuler</button>
+        <button class="button button-danger" id="quit-button" type="button">Quitter</button>
+      </div>
+      <div class="ready-banner" id="ready-banner" hidden><span class="ready-check">✓</span><div><strong>Vous êtes prêt à voter</strong><p>La connexion, le maillage et la synchronisation sont terminés.</p></div></div>
+    </section>
+    <footer>MyVote · Système de vote pair-à-pair</footer>
+  </main>
+</body>
+</html>
