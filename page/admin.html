@@ -1,49 +1,235 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="../css/admin.css">
-
-    <title>Formulaire</title>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Création du scrutin · P2P-VoteEngine</title>
+  <meta name="color-scheme" content="light dark">
+  <link rel="stylesheet" href="style.css">
+  <!-- Appliqué avant le rendu pour éviter un flash de thème -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('p2pve.theme');
+        var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', saved || (dark ? 'dark' : 'light'));
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
 
-    <h1>Formulaire de creation</h1>
-    <form id="form">
-        <div class="title">
-            <label for="title">Titre:</label>
-            <input type="text" id="title" name="title" maxlength="100" placeholder=" Votre Titre" required>
+  <!-- Icônes (sprite SVG) -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-vote" viewBox="0 0 24 24"><path d="m9 12 2 2 4-4"/><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7z"/><path d="M22 19H2"/></symbol>
+    <symbol id="i-grip" viewBox="0 0 24 24"><g fill="currentColor" stroke="none"><circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/></g></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-loader" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#main" data-i18n="a11y.skip">Aller au contenu</a>
+
+  <!-- ===== En-tête (identique à la page Accueil) ===== -->
+  <header class="app-header">
+    <a class="brand" href="index.html" aria-label="P2P-VoteEngine">
+      <span class="brand-mark"><svg class="icon icon--lg"><use href="#i-vote"/></svg></span>
+      <span class="brand-name">P2P-VoteEngine</span>
+    </a>
+
+    <div class="header-tools">
+      <div class="net" id="net" data-state="online" role="status" aria-live="polite">
+        <span class="net-dot" aria-hidden="true"></span>
+        <span id="netLabel">Connecté · 0 pair</span>
+      </div>
+
+      <div class="theme-toggle" role="group" data-i18n-aria="theme.aria" aria-label="Thème">
+        <button type="button" class="theme-btn" data-theme-btn="light" aria-pressed="true">
+          <svg class="icon"><use href="#i-sun"/></svg><span data-i18n="theme.light">Clair</span>
+        </button>
+        <button type="button" class="theme-btn" data-theme-btn="dark" aria-pressed="false">
+          <svg class="icon"><use href="#i-moon"/></svg><span data-i18n="theme.dark">Sombre</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page" id="main">
+    <div class="column">
+
+      <!-- Titre de page -->
+      <div class="page-head">
+        <nav class="breadcrumb" data-i18n-aria="nav.aria" aria-label="Fil d’Ariane">
+          <a href="index.html"><svg class="icon icon--sm"><use href="#i-back"/></svg><span data-i18n="nav.home">Accueil</span></a>
+          <span aria-hidden="true">/</span>
+          <span data-i18n="nav.organizer">Espace organisateur</span>
+        </nav>
+        <h1 data-i18n="title">Création du scrutin</h1>
+        <p class="lead" data-i18n="lead">Définissez le scrutin, puis chargez le registre des électeurs autorisés.</p>
+      </div>
+
+      <!-- Stepper desktop -->
+      <ol class="stepper" data-i18n-aria="step.aria" aria-label="Progression">
+        <li class="step is-current" aria-current="step"><span class="step-dot">1</span><span data-i18n="step.1">Scrutin</span></li>
+        <li class="step-line" aria-hidden="true"></li>
+        <li class="step"><span class="step-dot">2</span><span data-i18n="step.2">Registre</span></li>
+        <li class="step-line" aria-hidden="true"></li>
+        <li class="step"><span class="step-dot">3</span><span data-i18n="step.3">Lancement</span></li>
+      </ol>
+      <!-- Stepper mobile -->
+      <div class="stepper-compact">
+        <p data-i18n="step.compact">Étape 1 sur 3 · Scrutin</p>
+        <div class="bars"><span class="is-on"></span><span></span><span></span></div>
+      </div>
+
+      <!-- ===== Formulaire ===== -->
+      <form id="ballotForm" class="card" novalidate>
+        <fieldset id="formFields" class="card-fields">
+          <legend class="sr-only" data-i18n="title">Création du scrutin</legend>
+
+          <!-- Titre -->
+          <div class="field" data-field="title">
+            <label class="label" for="title">
+              <span data-i18n="field.title">Titre du scrutin</span> <span class="req" aria-hidden="true">*</span>
+            </label>
+            <div class="control">
+              <input id="title" name="title" type="text" required maxlength="120" autocomplete="off"
+                     placeholder="Ex. Élection du délégué de classe" data-i18n-placeholder="ph.title"
+                     aria-describedby="err-title">
+            </div>
+            <p class="error" id="err-title" role="alert" hidden><svg class="icon icon--sm"><use href="#i-alert"/></svg><span></span></p>
+          </div>
+
+          <!-- Description -->
+          <div class="field" data-field="desc">
+            <label class="label" for="desc">
+              <span data-i18n="field.desc">Description</span> <span class="opt" data-i18n="optional">(facultatif)</span>
+            </label>
+            <div class="control control--area">
+              <textarea id="desc" name="desc" rows="3" maxlength="500"
+                        placeholder="Précisez l’objet du vote pour les électeurs" data-i18n-placeholder="ph.desc"></textarea>
+            </div>
+          </div>
+
+          <!-- Type de scrutin -->
+          <div class="field" data-field="type" role="radiogroup" aria-labelledby="typeLabel">
+            <span class="label" id="typeLabel">
+              <span data-i18n="field.type">Type de scrutin</span> <span class="req" aria-hidden="true">*</span>
+            </span>
+            <div class="segmented">
+              <label class="seg">
+                <input type="radio" name="type" value="single" checked>
+                <span class="seg-item"><strong data-i18n="type.single">Unique</strong><small data-i18n="type.single.sub">1 choix</small></span>
+              </label>
+              <label class="seg">
+                <input type="radio" name="type" value="multiple">
+                <span class="seg-item"><strong data-i18n="type.multiple">Multiple</strong><small data-i18n="type.multiple.sub">Plusieurs</small></span>
+              </label>
+              <label class="seg">
+                <input type="radio" name="type" value="weighted">
+                <span class="seg-item"><strong data-i18n="type.weighted">Pondéré</strong><small data-i18n="type.weighted.sub">Points</small></span>
+              </label>
+            </div>
+            <p class="hint" id="typeHint">Un seul choix par électeur.</p>
+          </div>
+
+          <!-- Nombre maximum de choix (type multiple) -->
+          <div class="field field--narrow" data-field="max" id="maxField" hidden>
+            <label class="label" for="maxChoices">
+              <span data-i18n="field.max">Nombre maximum de choix</span> <span class="req" aria-hidden="true">*</span>
+            </label>
+            <div class="control">
+              <input id="maxChoices" name="maxChoices" type="number" inputmode="numeric" min="1" step="1"
+                     placeholder="2" aria-describedby="hint-max err-max">
+            </div>
+            <p class="hint" id="hint-max">Entre 1 et 1.</p>
+            <p class="error" id="err-max" role="alert" hidden><svg class="icon icon--sm"><use href="#i-alert"/></svg><span></span></p>
+          </div>
+
+          <!-- Date et heure de fin -->
+          <div class="row-2">
+            <div class="field" data-field="date">
+              <label class="label" for="endDate">
+                <span data-i18n="field.date">Date de fin</span> <span class="req" aria-hidden="true">*</span>
+              </label>
+              <div class="control">
+                <input id="endDate" name="endDate" type="date" required aria-describedby="err-date">
+              </div>
+              <p class="error" id="err-date" role="alert" hidden><svg class="icon icon--sm"><use href="#i-alert"/></svg><span></span></p>
+            </div>
+            <div class="field field--time" data-field="time">
+              <label class="label" for="endTime">
+                <span data-i18n="field.time">Heure</span> <span class="req" aria-hidden="true">*</span>
+              </label>
+              <div class="control">
+                <input id="endTime" name="endTime" type="time" required aria-describedby="err-time">
+              </div>
+              <p class="error" id="err-time" role="alert" hidden><svg class="icon icon--sm"><use href="#i-alert"/></svg><span></span></p>
+            </div>
+          </div>
+
+          <!-- Liste des choix -->
+          <div class="field" data-field="choices">
+            <div class="choices-head">
+              <span class="label">
+                <span data-i18n="choices.label">Choix du scrutin</span> <span class="req" aria-hidden="true">*</span>
+              </span>
+              <span class="count" id="choicesCount" aria-live="polite">2 choix · min. 2</span>
+            </div>
+
+            <ol class="choices-list" id="choicesList" data-type="single"></ol>
+
+            <p class="error" id="err-choices" role="alert" hidden><svg class="icon icon--sm"><use href="#i-alert"/></svg><span></span></p>
+
+            <div>
+              <button type="button" class="btn btn--secondary" id="addChoice">
+                <svg class="icon"><use href="#i-plus"/></svg><span data-i18n="choices.add">Ajouter un choix</span>
+              </button>
+            </div>
+            <p class="hint" data-i18n="choices.dragHint">Glissez la poignée pour réordonner les choix.</p>
+          </div>
+        </fieldset>
+      </form>
+
+      <!-- ===== Actions ===== -->
+      <div class="actions">
+        <p class="hint" id="statusHint" data-i18n="status.incomplete">Complétez les champs obligatoires (*) pour continuer.</p>
+        <p class="chip" id="statusValid" hidden><svg class="icon icon--sm"><use href="#i-check"/></svg><span data-i18n="status.valid">Formulaire valide</span></p>
+
+        <div class="actions-buttons">
+          <button type="button" class="btn btn--secondary" id="cancelBtn" data-i18n="actions.cancel">Annuler</button>
+          <button type="submit" class="btn btn--primary" id="nextBtn" form="ballotForm" disabled>
+            <svg class="icon spinner" hidden><use href="#i-loader"/></svg>
+            <span id="nextLabel" data-i18n="actions.next">Suivant</span>
+            <svg class="icon" id="nextArrow"><use href="#i-arrow"/></svg>
+          </button>
         </div>
+      </div>
 
-        <br><br>
-        <div class="descr">
-            <label for="descr">Description:</label>
-            <textarea id="descr" name="descr" placeholder="Votre Description"></textarea>
-        </div>
+    </div>
+  </main>
 
-        <br><br>
-        <div class="date">
-            <label for="time">Date Fin:</label>
-            <input type="datetime-local" id="time" name="time">
-        </div>
-
-        <br><br>
-        <div class="button">
-            <label for="button">Aperçu</label>
-            <input type="button" id="button" name="button" value="Aperçu">
-        </div>
-
-        <br><br>
-
+  <!-- Modale : quitter la création -->
+  <dialog id="leaveDialog" class="dialog" aria-labelledby="leaveTitle">
+    <form method="dialog">
+      <h2 id="leaveTitle" data-i18n="dlg.title">Abandonner la création ?</h2>
+      <p data-i18n="dlg.text">Les informations saisies seront perdues.</p>
+      <div class="dialog-actions">
+        <button class="btn btn--secondary" value="stay" data-i18n="dlg.stay">Continuer la saisie</button>
+        <button class="btn btn--danger" value="leave" data-i18n="dlg.leave">Quitter</button>
+      </div>
     </form>
+  </dialog>
 
-    <h2>Résultat</h2>
-    <pre id="résultat"></pre>
+  <!-- Toasts -->
+  <div class="toasts" id="toasts" aria-live="polite"></div>
 
-    <script src="../js/admin/createForm.js"></script>    <!--script connects js to html page>
-
+  <script src="app.js"></script>
 </body>
 </html>

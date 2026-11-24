@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selection Form</title>
+</head>
+<body>
+    
+    <h1>Please select your voting type</h1>
+
+    <br>
+
+    <form>
+        <div class="option">
+            <label for="types">Voting Types</label>
+            <select id="types" name="types" >
+                <option value="uninominal">Uninominal</option>
+                <option value="multiple">Multiples</option>
+                <option value="pondere">Pondéré</option>
+                </select>
+        </div>
+
+        <br>
+
+        <div class="option" id="maxChoixField" hidden>  <!--Hidden makes the field invisible when the page loads-->
+            <label for="maxChoix">Nombre Maximum de choix</label>
+            <input type="number" id="maxChoix" name="maxChoix">
+        </div>
+
+        <br>
+
+        <div class="option" id="totalPointsField" hidden>
+            <label for="totalPoints">Nombre total de points</label>
+            <input type="number" id="totalPoints" name="totalPoints">
+        </div>
+    </form>
+
+    <p id="message"></p>
+    <pre id="output"></pre>
+
+    <script src="../js/selection.js"></script>
+</body>
+</html>
