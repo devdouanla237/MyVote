@@ -13,120 +13,244 @@
   <header class="header">
     <a class="logo" href="index.html" aria-label="P2P-VoteEngine, accueil">
       <span class="logo__mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        <svg viewBox="0 0 24 24">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
       </span>
       <span class="logo__name">P2P-VoteEngine</span>
     </a>
 
     <div class="header__actions">
-      <!-- Indicateur réseau : data-state = online | degraded | offline -->
+
+      <!-- Indicateur réseau -->
       <div class="net" id="net" data-state="online" role="status" aria-live="polite">
         <span class="net__dot" aria-hidden="true"></span>
-        <span class="net__label" id="netLabel">Réseau prêt · 0 pair</span>
+        <span data-i18n="net.online" class="net__label" id="netLabel">
+          Réseau prêt · 0 pair
+        </span>
       </div>
 
+      <!-- Sélecteur de langue -->
       <div class="lang" role="group" aria-label="Langue">
         <button class="lang__btn is-active" type="button" data-lang="fr" aria-pressed="true">FR</button>
         <button class="lang__btn" type="button" data-lang="en" aria-pressed="false">EN</button>
       </div>
 
+      <!-- Sélecteur de thème -->
       <div class="theme" role="group" aria-label="Thème">
         <button class="theme__btn" type="button" data-theme-set="light" aria-label="Thème clair" aria-pressed="false">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
         </button>
+
         <button class="theme__btn is-active" type="button" data-theme-set="dark" aria-label="Thème sombre" aria-pressed="true">
-          <svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/>
+          </svg>
         </button>
       </div>
-      <!-- Version mobile : un seul bouton -->
+
+      <!-- Version mobile -->
       <button class="theme-single" id="themeSingle" type="button" aria-label="Changer de thème">
-        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        </svg>
+
+        <svg class="icon-moon" viewBox="0 0 24 24">
+          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/>
+        </svg>
       </button>
+
     </div>
   </header>
 
   <!-- ============ CONTENU ============ -->
   <main class="main">
 
+    <!-- Présentation -->
     <section class="hero">
+
       <span class="badge">
-        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Sans serveur central · Chiffrement RSA-OAEP
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <span data-i18n="badge">
+          Sans serveur central · Chiffrement RSA-OAEP
+        </span>
       </span>
-      <h1 class="hero__title">Votez en toute confiance, directement entre navigateurs.</h1>
-      <p class="hero__text">Plateforme de vote électronique en temps réel : bulletins chiffrés, un jeton = un seul vote, résultats vérifiables par tous. Aucune base de données centrale.</p>
+
+      <h1 class="hero__title" data-i18n="title">
+        Votez en toute confiance, directement entre navigateurs.
+      </h1>
+
+      <p class="hero__text" data-i18n="text">
+        Plateforme de vote électronique en temps réel : bulletins chiffrés,
+        un jeton = un seul vote, résultats vérifiables par tous.
+        Aucune base de données centrale.
+      </p>
+
     </section>
 
+    <!-- Choix du rôle -->
     <section class="roles" aria-label="Choisir son rôle">
 
       <!-- Carte organisateur -->
       <article class="card card--org">
+
         <div class="card__body">
+
           <div class="card__top">
             <span class="card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/></svg>
+              <svg viewBox="0 0 24 24">
+                <rect x="8" y="2" width="8" height="4" rx="1"/>
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                <path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/>
+              </svg>
             </span>
-            <span class="card__tag">1 · Gestion du scrutin</span>
+
+            <span class="card__tag" data-i18n="orgTag">
+              1 · Gestion du scrutin
+            </span>
           </div>
-          <h2 class="card__title">Je suis organisateur</h2>
-          <p class="card__text">Créez un scrutin, chargez les jetons autorisés, générez les clés RSA et pilotez le vote en direct.</p>
+
+          <h2 class="card__title" data-i18n="orgTitle">
+            Je suis organisateur
+          </h2>
+
+          <p class="card__text" data-i18n="orgText">
+            Créez un scrutin, chargez les jetons autorisés, générez les clés RSA et pilotez le vote en direct.
+          </p>
+
           <ul class="card__list">
-            <li>Créer le scrutin et ses choix</li>
-            <li>Charger le registre des jetons</li>
-            <li>Générer les clés et lancer la session</li>
+            <li data-i18n="orgList.0">Créer le scrutin et ses choix</li>
+            <li data-i18n="orgList.1">Charger le registre des jetons</li>
+            <li data-i18n="orgList.2">Générer les clés et lancer la session</li>
           </ul>
+
         </div>
-        <a class="btn" href="organisateur/creation.html">
-          Créer un scrutin
-          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+
+        <a class="btn" href="./page/admin.html">
+          <span data-i18n="orgBtn">Créer un scrutin</span>
+          <svg viewBox="0 0 24 24">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
         </a>
+
       </article>
 
       <!-- Carte électeur -->
       <article class="card card--voter">
+
         <div class="card__body">
+
           <div class="card__top">
             <span class="card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="m9 12 2 2 4-4"/><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7z"/><path d="M22 19H2"/></svg>
+              <svg viewBox="0 0 24 24">
+                <path d="m9 12 2 2 4-4"/>
+                <path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7z"/>
+                <path d="M22 19H2"/>
+              </svg>
             </span>
-            <span class="card__tag">2 · Espace électeur</span>
+
+            <span class="card__tag" data-i18n="voterTag">
+              2 · Espace électeur
+            </span>
           </div>
-          <h2 class="card__title">Je suis électeur</h2>
-          <p class="card__text">Rejoignez une session avec son Session ID et votre jeton, votez en toute confidentialité et conservez votre reçu.</p>
+
+          <h2 class="card__title" data-i18n="voterTitle">
+            Je suis électeur
+          </h2>
+
+          <p class="card__text" data-i18n="voterText">
+            Rejoignez une session avec son Session ID et votre jeton, votez en toute confidentialité et conservez votre reçu.
+          </p>
+
           <ul class="card__list">
-            <li>Saisir le Session ID et votre jeton</li>
-            <li>Voter : bulletin chiffré dans votre navigateur</li>
-            <li>Recevoir une empreinte de vérification</li>
+            <li data-i18n="voterList.0">Saisir le Session ID et votre jeton</li>
+            <li data-i18n="voterList.1">Voter : bulletin chiffré dans votre navigateur</li>
+            <li data-i18n="voterList.2">Recevoir une empreinte de vérification</li>
           </ul>
+
         </div>
+
         <a class="btn" href="electeur/rejoindre.html">
-          Rejoindre une session
-          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <span data-i18n="voterBtn">Rejoindre une session</span>
+          <svg viewBox="0 0 24 24">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
         </a>
+
       </article>
+
     </section>
 
+    <!-- Garanties -->
     <section class="guarantees" aria-label="Garanties">
+
       <div class="guarantee">
-        <span class="guarantee__icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-        <div><h3>Anonymat</h3><p>Bulletin chiffré en RSA-OAEP avant tout envoi.</p></div>
+        <span class="guarantee__icon">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </span>
+
+        <div>
+          <h3 data-i18n="g.0.0">Anonymat</h3>
+          <p data-i18n="g.0.1">
+            Bulletin chiffré en RSA-OAEP avant tout envoi.
+          </p>
+        </div>
       </div>
+
       <div class="guarantee">
-        <span class="guarantee__icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg></span>
-        <div><h3>Vote unique</h3><p>Un jeton autorisé = un seul vote.</p></div>
+        <span class="guarantee__icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="m16 11 2 2 4-4"/>
+          </svg>
+        </span>
+
+        <div>
+          <h3 data-i18n="g.1.0">Vote unique</h3>
+          <p data-i18n="g.1.1">
+            Un jeton autorisé = un seul vote.
+          </p>
+        </div>
       </div>
+
       <div class="guarantee">
-        <span class="guarantee__icon"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
-        <div><h3>Transparence</h3><p>Registre partagé, résultats vérifiables.</p></div>
+        <span class="guarantee__icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </span>
+
+        <div>
+          <h3 data-i18n="g.2.0">Transparence</h3>
+          <p data-i18n="g.2.1">
+            Registre partagé, résultats vérifiables.
+          </p>
+        </div>
       </div>
+
     </section>
+
   </main>
 
-  <footer class="footer">
+  <!-- Pied de page -->
+  <footer class="footer" data-i18n="footer">
     ISI3195 · Technologies Web et Programmation 1 · Saint Jean Ingénieur
   </footer>
 
-  <script  type="module"src="./js/index/theme_lang.js"></script>
+  <script type="module" src="./js/index/theme_lang.js"></script>
+
 </body>
 </html>

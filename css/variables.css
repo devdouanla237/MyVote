@@ -1,64 +1,92 @@
 @import url("./variables.css");
 
 :root {
---bg: #F6F7FB;
-  --surface: #FFFFFF;
-  --hover: #F8F8FF;
+  --bg: #f6f7fb;
+  --surface: #ffffff;
+  --hover: #f8f8ff;
   --text: #111827;
-  --muted: #5B6477;
-  --border: #E3E6EF;
+  --muted: #5b6477;
+  --border: #e3e6ef;
 
-  --primary: #4F46E5;
-  --on-primary: #FFFFFF;
-  --primary-soft: #EEF0FF;
+  --primary: #4f46e5;
+  --on-primary: #ffffff;
+  --primary-soft: #eef0ff;
 
-  --accent: #0D9488;
-  --on-accent: #FFFFFF;
-  --accent-soft: #E3F6F3;
+  --accent: #0d9488;
+  --on-accent: #ffffff;
+  --accent-soft: #e3f6f3;
 
-  --success: #16A34A;
-  --success-soft: #E8F7EE;
-  --warning: #D97706;
-  --warning-soft: #FEF3E2;
-  --danger: #DC2626;
-  --danger-soft: #FDECEC;
+  --success: #16a34a;
+  --success-soft: #e8f7ee;
+  --warning: #d97706;
+  --warning-soft: #fef3e2;
+  --error: #dc2626;
+  --error-soft: #fdecec;
+  --shadow-card: 0 2px 8px rgb(0 0 0 / 0.06);
+  --shadow-hover-org: 0 14px 32px -4px rgb(79 70 229 / 0.2);
+  --shadow-hover-voter: 0 14px 32px -4px rgb(13 148 136 / 0.2);
+  --ring-org: 0 0 0 4px rgb(79 70 229 / 0.4);
+  --ring-voter: 0 0 0 4px rgb(13 148 136 / 0.4);
 
-  --shadow-card: 0 2px 8px rgb(0 0 0 / .06);
-  --shadow-hover-org: 0 14px 32px -4px rgb(79 70 229 / .20);
-  --shadow-hover-voter: 0 14px 32px -4px rgb(13 148 136 / .20);
-  --ring-org: 0 0 0 4px rgb(79 70 229 / .40);
-  --ring-voter: 0 0 0 4px rgb(13 148 136 / .40);
+  --surface-2: #eef2f9;
+
+  --placeholder: #8a94a8;
+
+  --disabled: #cdd3df;
+  --disabled-text: #6b7589;
+  --ring: rgba(36, 87, 230, 0.28);
+  --shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+--radius-card: 24px;
+  --radius-btn: 14px;
+  --radius-s: 10px;
+  --radius-m: 12px;
+  --radius-l: 16px;
+  color-scheme: light;
 }
+
+
+
 :root[data-theme="dark"] {
---bg: #0E1220;
-  --surface: #171C2E;
-  --hover: #1D2344;
-  --text: #F3F4F8;
-  --muted: #A3ABBE;
-  --border: #2A3150;
+  --bg: #0e1220;
+  --surface: #171c2e;
+  --surface-2: #1c2540;
 
-  --primary: #8B8DFF;
-  --on-primary: #0E1220;
-  --primary-soft: #242A52;
+  --hover: #1d2344;
+  --text: #f3f4f8;
+  --muted: #a3abbe;
+  --border: #2a3150;
 
-  --accent: #2DD4BF;
-  --on-accent: #06201E;
-  --accent-soft: #0F2E2D;
+  --primary: #8b8dff;
+  --on-primary: #0e1220;
+  --primary-soft: #242a52;
 
-  --success: #4ADE80;
-  --success-soft: #12301F;
-  --warning: #FBBF24;
-  --warning-soft: #33290F;
-  --danger: #F87171;
-  --danger-soft: #35181B;
+  --accent: #2dd4bf;
+  --on-accent: #06201e;
+  --accent-soft: #0f2e2d;
 
-  --shadow-card: 0 2px 8px rgb(0 0 0 / .35);
-  --shadow-hover-org: 0 14px 32px -4px rgb(139 141 255 / .30);
-  --shadow-hover-voter: 0 14px 32px -4px rgb(45 212 191 / .30);
-  --ring-org: 0 0 0 4px rgb(139 141 255 / .40);
-  --ring-voter: 0 0 0 4px rgb(45 212 191 / .40);
+  --success: #4ade80;
+  --success-soft: #12301f;
+  --warning: #fbbf24;
+  --warning-soft: #33290f;
+  --error: #f87171;
+  --error-soft: #35181b;
 
+  --shadow-card: 0 2px 8px rgb(0 0 0 / 0.35);
+  --shadow-hover-org: 0 14px 32px -4px rgb(139 141 255 / 0.3);
+  --shadow-hover-voter: 0 14px 32px -4px rgb(45 212 191 / 0.3);
+  --ring-org: 0 0 0 4px rgb(139 141 255 / 0.4);
+  --ring-voter: 0 0 0 4px rgb(45 212 191 / 0.4);
+  --on-primary: #0B1020;
+--disabled: #2C3756;
   --radius-card: 24px;
   --radius-btn: 14px;
+   --ring: rgba(127, 160, 255, .35);
+  --disabled-text: #8591AB;
+  --shadow: none;
+  color-scheme: dark;
+    --placeholder: #7C88A3;
+
   --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
+
+

@@ -4,3 +4,46 @@ body {
     background-color: var(--bg);
     color: var(--text);
 }
+
+
+
+.lang, .theme {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.theme { background: var(--bg); }
+.lang__btn {
+  padding: 6px 12px;
+  border: 0; border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px; font-weight: 500;
+}
+.lang__btn.is-active { background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+
+
+.theme__btn {
+  display: grid; place-items: center;
+  width: 32px; height: 32px;
+  border: 0; border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+}
+.theme__btn svg { width: 18px; height: 18px; }
+.theme__btn.is-active { background: var(--primary); color: var(--on-primary); }
+
+
+.theme-single {
+  display: none;
+  place-items: center;
+  width: 40px; height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--text);
+}
+.theme-single svg { width: 20px; height: 20px; }
+:root[data-theme="dark"] .theme-single .icon-moon,
+:root[data-theme="light"] .theme-single .icon-sun { display: none; }

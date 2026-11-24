@@ -2,7 +2,8 @@
    P2P-VoteEngine · Création du scrutin (page 2)
    JavaScript pur, sans framework.
    ========================================================== */
-'use strict';
+import { I18N } from "../../utils/I8n.js";
+
 
 (() => {
   /* ---------- Configuration ---------- */
@@ -17,101 +18,6 @@
     PEER_COUNT: 0               // aucun pair avant le lancement de la session
   };
 
-  /* ---------- Textes FR / EN ---------- */
-  const I18N = {
-    fr: {
-      'a11y.skip': 'Aller au contenu',
-      'theme.aria': 'Thème', 'theme.light': 'Clair', 'theme.dark': 'Sombre',
-      'net.online': 'Connecté · {n} pair', 'net.onlineMany': 'Connecté · {n} pairs',
-      'net.degraded': 'Réseau dégradé', 'net.offline': 'Déconnecté',
-      'nav.aria': 'Fil d’Ariane', 'nav.home': 'Accueil', 'nav.organizer': 'Espace organisateur',
-      'title': 'Création du scrutin',
-      'lead': 'Définissez le scrutin, puis chargez le registre des électeurs autorisés.',
-      'step.aria': 'Progression', 'step.1': 'Scrutin', 'step.2': 'Registre', 'step.3': 'Lancement',
-      'step.compact': 'Étape 1 sur 3 · Scrutin',
-      'field.title': 'Titre du scrutin', 'ph.title': 'Ex. Élection du délégué de classe',
-      'field.desc': 'Description', 'optional': '(facultatif)', 'ph.desc': 'Précisez l’objet du vote pour les électeurs',
-      'field.type': 'Type de scrutin',
-      'type.single': 'Unique', 'type.single.sub': '1 choix',
-      'type.multiple': 'Multiple', 'type.multiple.sub': 'Plusieurs',
-      'type.weighted': 'Pondéré', 'type.weighted.sub': 'Points',
-      'hint.single': 'Un seul choix par électeur.',
-      'hint.multiple': 'Chaque électeur peut cocher plusieurs choix, dans la limite fixée.',
-      'hint.weighted': 'Chaque choix a un poids ; l’électeur répartit ses points.',
-      'field.max': 'Nombre maximum de choix', 'hint.max': 'Entre 1 et {n}.',
-      'field.date': 'Date de fin', 'field.time': 'Heure',
-      'choices.label': 'Choix du scrutin',
-      'choices.count': '{n} choix · min. {min}', 'choices.countWeighted': '{n} choix · total {p} pts',
-      'choices.add': 'Ajouter un choix', 'choices.dragHint': 'Glissez la poignée pour réordonner les choix.',
-      'choice.placeholder': 'Choix {n}', 'choice.weight': 'Poids du choix {n}', 'choice.unit': 'pts',
-      'choice.delete': 'Supprimer le choix {n}',
-      'choice.move': 'Déplacer le choix {n} (glisser, ou flèches haut et bas)',
-      'actions.cancel': 'Annuler', 'actions.next': 'Suivant', 'actions.loading': 'Vérification…',
-      'status.valid': 'Formulaire valide',
-      'status.incomplete': 'Complétez les champs obligatoires (*) pour continuer.',
-      'status.saving': 'Enregistrement du scrutin…',
-      'err.title': 'Le titre est obligatoire.',
-      'err.dateRequired': 'La date de fin est obligatoire.',
-      'err.datePast': 'La date de fin doit être dans le futur.',
-      'err.timeRequired': 'L’heure est obligatoire.',
-      'err.minChoices': 'Ajoutez au moins {min} choix pour continuer.',
-      'err.emptyChoice': 'Remplissez ou supprimez les choix vides.',
-      'err.dupChoice': 'Les choix doivent être différents.',
-      'err.weight': 'Le poids doit être un entier supérieur ou égal à 1.',
-      'err.max': 'Saisissez un nombre entier entre 1 et {n}.',
-      'toast.saved': 'Scrutin enregistré. Étape suivante : le registre des électeurs.',
-      'toast.saveError': 'Impossible d’enregistrer le brouillon sur cet appareil.',
-      'toast.offline': 'Problème de connexion : vérifiez votre Internet puis réessayez.',
-      'dlg.title': 'Abandonner la création ?', 'dlg.text': 'Les informations saisies seront perdues.',
-      'dlg.stay': 'Continuer la saisie', 'dlg.leave': 'Quitter'
-    },
-    en: {
-      'a11y.skip': 'Skip to content',
-      'theme.aria': 'Theme', 'theme.light': 'Light', 'theme.dark': 'Dark',
-      'net.online': 'Connected · {n} peer', 'net.onlineMany': 'Connected · {n} peers',
-      'net.degraded': 'Degraded network', 'net.offline': 'Disconnected',
-      'nav.aria': 'Breadcrumb', 'nav.home': 'Home', 'nav.organizer': 'Organizer area',
-      'title': 'Create the ballot',
-      'lead': 'Define the ballot, then load the register of authorized voters.',
-      'step.aria': 'Progress', 'step.1': 'Ballot', 'step.2': 'Register', 'step.3': 'Launch',
-      'step.compact': 'Step 1 of 3 · Ballot',
-      'field.title': 'Ballot title', 'ph.title': 'e.g. Class representative election',
-      'field.desc': 'Description', 'optional': '(optional)', 'ph.desc': 'Explain what the vote is about',
-      'field.type': 'Ballot type',
-      'type.single': 'Single', 'type.single.sub': '1 choice',
-      'type.multiple': 'Multiple', 'type.multiple.sub': 'Several',
-      'type.weighted': 'Weighted', 'type.weighted.sub': 'Points',
-      'hint.single': 'One choice per voter.',
-      'hint.multiple': 'Each voter can tick several choices, up to the set limit.',
-      'hint.weighted': 'Each choice has a weight; voters spread their points.',
-      'field.max': 'Maximum number of choices', 'hint.max': 'Between 1 and {n}.',
-      'field.date': 'End date', 'field.time': 'Time',
-      'choices.label': 'Ballot choices',
-      'choices.count': '{n} choices · min. {min}', 'choices.countWeighted': '{n} choices · total {p} pts',
-      'choices.add': 'Add a choice', 'choices.dragHint': 'Drag the handle to reorder the choices.',
-      'choice.placeholder': 'Choice {n}', 'choice.weight': 'Weight of choice {n}', 'choice.unit': 'pts',
-      'choice.delete': 'Delete choice {n}',
-      'choice.move': 'Move choice {n} (drag, or up and down arrows)',
-      'actions.cancel': 'Cancel', 'actions.next': 'Next', 'actions.loading': 'Checking…',
-      'status.valid': 'Form is valid',
-      'status.incomplete': 'Fill in the required fields (*) to continue.',
-      'status.saving': 'Saving the ballot…',
-      'err.title': 'The title is required.',
-      'err.dateRequired': 'The end date is required.',
-      'err.datePast': 'The end date must be in the future.',
-      'err.timeRequired': 'The time is required.',
-      'err.minChoices': 'Add at least {min} choices to continue.',
-      'err.emptyChoice': 'Fill in or remove the empty choices.',
-      'err.dupChoice': 'Choices must be different.',
-      'err.weight': 'The weight must be a whole number of 1 or more.',
-      'err.max': 'Enter a whole number between 1 and {n}.',
-      'toast.saved': 'Ballot saved. Next step: the voter register.',
-      'toast.saveError': 'The draft could not be saved on this device.',
-      'toast.offline': 'Connection problem: check your Internet and try again.',
-      'dlg.title': 'Discard this ballot?', 'dlg.text': 'The information entered will be lost.',
-      'dlg.stay': 'Keep editing', 'dlg.leave': 'Leave'
-    }
-  };
 
   /* ---------- Utilitaires ---------- */
   const $ = (sel, root = document) => root.querySelector(sel);

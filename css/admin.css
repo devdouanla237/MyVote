@@ -1,61 +1,355 @@
-/* ==========================================================
-   P2P-VoteEngine · Création du scrutin
-   CSS pur (Flexbox, Grid, variables CSS). Thèmes clair / sombre.
-   Les tokens ci-dessous correspondent aux tokens Figma.
-   ========================================================== */
+@import url("./global.css");
 
-:root {
-  --font: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  /* Tokens thème clair */
-  --bg: #F5F7FB;
-  --surface: #FFFFFF;
-  --surface-2: #EEF2F9;
-  --text: #0F172A;
-  --muted: #566074;
-  --placeholder: #8A94A8;
-  --border: #D2D9E6;
-  --primary: #2457E6;
-  --on-primary: #FFFFFF;
-  --success: #15803D;
-  --success-soft: #DDF3E5;
-  --warning: #B45309;
-  --warning-soft: #FDEBD0;
-  --error: #C62828;
-  --error-soft: #FBE4E4;
-  --disabled: #CDD3DF;
-  --disabled-text: #6B7589;
-  --ring: rgba(36, 87, 230, .28);
-  --shadow: 0 1px 2px rgba(15, 23, 42, .04);
 
-  --radius-s: 10px;
-  --radius-m: 12px;
-  --radius-l: 16px;
-  color-scheme: light;
-}
 
-:root[data-theme="dark"] {
-  --bg: #0B1020;
-  --surface: #141B2E;
-  --surface-2: #1C2540;
-  --text: #EEF2FA;
-  --muted: #A3AEC4;
-  --placeholder: #7C88A3;
-  --border: #2C3756;
-  --primary: #7FA0FF;
-  --on-primary: #0B1020;
-  --success: #4ADE80;
-  --success-soft: #153B27;
-  --warning: #FBBF24;
-  --warning-soft: #3D2E0F;
-  --error: #FF8A8A;
-  --error-soft: #3D1B1F;
-  --disabled: #2C3756;
-  --disabled-text: #8591AB;
-  --ring: rgba(127, 160, 255, .35);
-  --shadow: none;
-  color-scheme: dark;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -123,6 +417,8 @@ ol { list-style: none; }
 .net[data-state="offline"]  { --net: var(--error);   --net-bg: var(--error-soft); }
 .net-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--net); }
 
+
+
 /* Bascule de thème */
 .theme-toggle {
   display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px;
@@ -134,6 +430,12 @@ ol { list-style: none; }
   background: transparent; color: var(--muted); font-size: 13px; font-weight: 500;
 }
 .theme-btn[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
+
+
+
+
+
+
 
 /* ---------- Page ---------- */
 .page { padding: 48px 48px 72px; }

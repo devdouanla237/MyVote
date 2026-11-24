@@ -38,44 +38,106 @@ document.getElementById("themeSingle").addEventListener("click", () =>
 
 let currentLang = "fr";
 
-function applyLang(lang) {
-  const t = I18N[lang];
-  if (!t) return;
-  currentLang = lang;
-  root.lang = lang;
 
-  const badge = document.querySelector(".badge");
-  badge.lastChild.textContent = " " + t.badge;
-  document.querySelector(".hero__title").textContent = t.title;
-  document.querySelector(".hero__text").textContent = t.text;
+export function getTranslation(object, path) {
 
-  [["org", "org"], ["voter", "voter"]].forEach(([cls, key]) => {
-    const card = document.querySelector(".card--" + cls);
-    card.querySelector(".card__tag").textContent = t[key + "Tag"];
-    card.querySelector(".card__title").textContent = t[key + "Title"];
-    card.querySelector(".card__text").textContent = t[key + "Text"];
-    card.querySelectorAll(".card__list li").forEach((li, i) => (li.textContent = t[key + "List"][i]));
-    card.querySelector(".btn").firstChild.textContent = t[key + "Btn"] + " ";
-  });
+    return path.split(".").reduce(
+        (current, key) => current?.[key],
+        object,
+        
+    )
 
-  document.querySelectorAll(".guarantee").forEach((el, i) => {
-    el.querySelector("h3").textContent = t.g[i][0];
-    el.querySelector("p").textContent = t.g[i][1];
-  });
-  document.querySelector(".footer").textContent = t.footer;
-
-  document.querySelectorAll("[data-lang]").forEach(btn => {
-    const active = btn.dataset.lang === lang;
-    btn.classList.toggle("is-active", active);
-    btn.setAttribute("aria-pressed", String(active));
-  });
-  safeSet(LANG_KEY, lang);
-  updateNetwork();
 }
 
-document.querySelectorAll("[data-lang]").forEach(btn =>
-  btn.addEventListener("click", () => applyLang(btn.dataset.lang))
-);
+function applyLang(lang) {
+
+    const translations = I18N[lang];
+
+    if (!translations) {
+        console.warn(`Langue non disponible1 : ${lang}`);
+        return;
+    }
+
+    currentLang = lang;
+    root.lang = lang;
+
+    // Traduire tous les éléments
+    document.querySelectorAll("[data-i18n]").forEach(element => {
+        
+        const key =getPageName()+"."+element.dataset.i18n;
+        const translation = getTranslation(translations, key);
+console.log(getTranslation(I18N.fr, "admin.actions.next"))
+        if (translation === undefined) {
+            console.warn(`Traduction manquante : ${key}`);
+            return;
+        }
+
+        element.textContent = translation;
+
+    });
+
+
+    // Traduire les attributs HTML
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(element => {
+const valeur = element.getAttribute("data-i18n-placeholder");
+        const key1 =getPageName()+"."+valeur
+
+        const translation = getTranslation(translations, key1);
+        console.log(translation+"ddsd")
+console.log(key1+"ugguih")
+        if (translation === undefined) {
+            console.warn(`Traduction manquante1 : ${key1}`);
+            return;
+        }
+
+element.placeholder = translation;
+    });
+  
+    ;
+
+    // Actualiser les boutons de langue
+    document.querySelectorAll("[data-lang]").forEach(button => {
+
+        const active = button.dataset.lang === lang;
+
+        button.classList.toggle("is-active", active);
+
+        button.setAttribute("aria-pressed", String(active));
+
+    });
+
+    safeSet(LANG_KEY, lang);
+
+   //< updateNetwork();
+}
+
+
+
+
+const langButtons = document.querySelectorAll(".lang__btn");
+
+langButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        // Récupérer la langue sélectionnée
+        const lang = button.dataset.lang;
+
+        // Mettre à jour l'apparence des boutons
+        langButtons.forEach(btn => {
+            const isActive = btn === button;
+
+            btn.classList.toggle("is-active", isActive);
+            btn.setAttribute("aria-pressed", isActive);
+        });
+
+ applyLang(lang)
+        // Changer la langue de l'application
+        console.log("Langue sélectionnée :", lang);
+
+    });
+
+});
 
 /* ---------------- Indicateur réseau ----------------
    Sur l'accueil, aucun pair n'est connecté : on reflète seulement l'état
@@ -84,13 +146,22 @@ document.querySelectorAll("[data-lang]").forEach(btn =>
 const net = document.getElementById("net");
 const netLabel = document.getElementById("netLabel");
 
-function updateNetwork() {
-  const online = navigator.onLine;
-  net.dataset.state = online ? "online" : "offline";
-  const labels = I18N[currentLang].net;
-  netLabel.textContent = online ? labels.online : labels.offline;
-}
-window.addEventListener("online", updateNetwork);
-window.addEventListener("offline", updateNetwork);
+// function updateNetwork() {
+//   const online = navigator.onLine;
+//   net.dataset.state = online ? "online" : "offline";
+//   const labels = I18N[currentLang].net;
+//   netLabel.textContent = online ? labels.online : labels.offline;
+// }
+// window.addEventListener("online", updateNetwork);
+// window.addEventListener("offline", updateNetwork);
 
 applyLang(safeGet(LANG_KEY) === "en" ? "en" : "fr");
+
+// recupere le nom de la page 
+function getPageName() {
+    return window.location.pathname
+        .split("/")
+        .pop()
+        .replace(".html", "");
+}
+

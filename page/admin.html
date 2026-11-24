@@ -5,17 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Création du scrutin · P2P-VoteEngine</title>
   <meta name="color-scheme" content="light dark">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/index.css">
+
   <!-- Appliqué avant le rendu pour éviter un flash de thème -->
-  <script>
-    (function () {
+   <!-- <script>
+    (function () 
       try {
         var saved = localStorage.getItem('p2pve.theme');
         var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         document.documentElement.setAttribute('data-theme', saved || (dark ? 'dark' : 'light'));
       } catch (e) {}
     })();
-  </script>
+  </script> -->
 </head>
 <body>
 
@@ -34,9 +36,10 @@
     <symbol id="i-loader" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></symbol>
   </svg>
 
-  <a class="skip-link" href="#main" data-i18n="a11y.skip">Aller au contenu</a>
+  <!-- <a class="skip-link" href="#main" data-i18n="a11y.skip">Aller au contenu</a> -->
 
   <!-- ===== En-tête (identique à la page Accueil) ===== -->
+   <!--
   <header class="app-header">
     <a class="brand" href="index.html" aria-label="P2P-VoteEngine">
       <span class="brand-mark"><svg class="icon icon--lg"><use href="#i-vote"/></svg></span>
@@ -46,7 +49,7 @@
     <div class="header-tools">
       <div class="net" id="net" data-state="online" role="status" aria-live="polite">
         <span class="net-dot" aria-hidden="true"></span>
-        <span id="netLabel">Connecté · 0 pair</span>
+        <span id="netLabel">Connecté · 1pair</span>
       </div>
 
       <div class="theme-toggle" role="group" data-i18n-aria="theme.aria" aria-label="Thème">
@@ -59,12 +62,100 @@
       </div>
     </div>
   </header>
+-->
+
+
+
+
+
+
+
+
+
+<!-- ============ EN-TÊTE ============ -->
+  <header class="header">
+    <a class="logo" href="index.html" aria-label="P2P-VoteEngine, accueil">
+      <span class="logo__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+      </span>
+      <span class="logo__name">P2P-VoteEngine</span>
+    </a>
+
+    <div class="header__actions">
+      <!-- Indicateur réseau : data-state = online | degraded | offline -->
+      <div class="net" id="net" data-state="online" role="status" aria-live="polite">
+        <span class="net__dot" aria-hidden="true"></span>
+        <span class="net__label" id="netLabel">Réseau prêt · 0 pair</span>
+      </div>
+
+      <div class="lang" role="group" aria-label="Langue">
+        <button class="lang__btn is-active" type="button" data-lang="fr" aria-pressed="true">FR</button>
+        <button class="lang__btn" type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+<!--le  theme  de la page-->
+      <div class="theme" role="group" aria-label="Thème">
+        <button class="theme__btn" type="button" data-theme-set="light" aria-label="Thème clair" aria-pressed="false">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        </button>
+        <button class="theme__btn is-active" type="button" data-theme-set="dark" aria-label="Thème sombre" aria-pressed="true">
+          <svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
+        </button>
+      </div>
+      <!-- Version mobile : un seul bouton -->
+      <button class="theme-single" id="themeSingle" type="button" aria-label="Changer de thème">
+        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
+      </button>
+    </div>
+  </header>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   <main class="page" id="main">
     <div class="column">
 
       <!-- Titre de page -->
-      <div class="page-head">
+      <!--<div class="page-head">
         <nav class="breadcrumb" data-i18n-aria="nav.aria" aria-label="Fil d’Ariane">
           <a href="index.html"><svg class="icon icon--sm"><use href="#i-back"/></svg><span data-i18n="nav.home">Accueil</span></a>
           <span aria-hidden="true">/</span>
@@ -72,7 +163,7 @@
         </nav>
         <h1 data-i18n="title">Création du scrutin</h1>
         <p class="lead" data-i18n="lead">Définissez le scrutin, puis chargez le registre des électeurs autorisés.</p>
-      </div>
+      </div>-->
 
       <!-- Stepper desktop -->
       <ol class="stepper" data-i18n-aria="step.aria" aria-label="Progression">
@@ -87,11 +178,10 @@
         <p data-i18n="step.compact">Étape 1 sur 3 · Scrutin</p>
         <div class="bars"><span class="is-on"></span><span></span><span></span></div>
       </div>
-
       <!-- ===== Formulaire ===== -->
       <form id="ballotForm" class="card" novalidate>
         <fieldset id="formFields" class="card-fields">
-          <legend class="sr-only" data-i18n="title">Création du scrutin</legend>
+          <legend class="sr-only" qq>Création du scrutin</legend>
 
           <!-- Titre -->
           <div class="field" data-field="title">
@@ -113,7 +203,7 @@
             </label>
             <div class="control control--area">
               <textarea id="desc" name="desc" rows="3" maxlength="500"
-                        placeholder="Précisez l’objet du vote pour les électeurs" data-i18n-placeholder="ph.desc"></textarea>
+                          placeholder="Précisez l’objet du vote pour les électeurs" data-i18n-placeholder="ph.desc"></textarea>
             </div>
           </div>
 
@@ -125,15 +215,24 @@
             <div class="segmented">
               <label class="seg">
                 <input type="radio" name="type" value="single" checked>
-                <span class="seg-item"><strong data-i18n="type.single">Unique</strong><small data-i18n="type.single.sub">1 choix</small></span>
+                <span class="seg-item">
+                  <strong data-i18n="type.single">Unique</strong>
+                  <small data-i18n="type.singleSub">1 choix</small>
+                </span>
               </label>
               <label class="seg">
                 <input type="radio" name="type" value="multiple">
-                <span class="seg-item"><strong data-i18n="type.multiple">Multiple</strong><small data-i18n="type.multiple.sub">Plusieurs</small></span>
+                <span class="seg-item">
+                  <strong data-i18n="type.multiple">Multiple</strong>
+                  <small data-i18n="type.multipleSub">Plusieurs</small>
+                </span>
               </label>
               <label class="seg">
                 <input type="radio" name="type" value="weighted">
-                <span class="seg-item"><strong data-i18n="type.weighted">Pondéré</strong><small data-i18n="type.weighted.sub">Points</small></span>
+                <span class="seg-item">
+                  <strong data-i18n="type.weighted">Pondéré</strong>
+                  <small data-i18n="type.weightedSub">Points</small>
+                </span>
               </label>
             </div>
             <p class="hint" id="typeHint">Un seul choix par électeur.</p>
@@ -203,7 +302,8 @@
         <p class="chip" id="statusValid" hidden><svg class="icon icon--sm"><use href="#i-check"/></svg><span data-i18n="status.valid">Formulaire valide</span></p>
 
         <div class="actions-buttons">
-          <button type="button" class="btn btn--secondary" id="cancelBtn" data-i18n="actions.cancel">Annuler</button>
+          <button type="button" class="btn btn--secondary" id="cancelBtn" data-i18n="actions.cancel">
+            Annuler</button>
           <button type="submit" class="btn btn--primary" id="nextBtn" form="ballotForm" disabled>
             <svg class="icon spinner" hidden><use href="#i-loader"/></svg>
             <span id="nextLabel" data-i18n="actions.next">Suivant</span>
@@ -230,8 +330,7 @@
     <h2>Résultat</h2>
     <pre id="résultat"></pre>
 
-    <script src="../js/admin/createForm.js"></script>    <!--script connects js to html page-->
+  <script  type="module" src="../js/index/theme_lang.js"></script>
 
-  <script src="app.js"></script>
 </body>
 </html>
