@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Salle d’attente · P2P-VoteEngine</title>
+ 
+  <!-- Applique le thème avant l’affichage (évite le flash blanc). Clé LocalStorage : "theme". -->
+  <script>
+    (function () {
+      var theme = 'light';
+      try {
+        var saved = localStorage.getItem('theme');
+        if (saved === 'light' || saved === 'dark') {
+          theme = saved;
+        } else if (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) {
+          theme = 'dark';
+        }
+      } catch (e) { /* stockage indisponible : thème clair */ }
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+ 
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/salle-attente.css">
+</head>
+<body>
+ 
+  <!-- Icônes (sprite SVG, aucune dépendance externe) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-spinner" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-cross" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4L2.5 20h19L12 4z"/><path d="M12 10v4.5M12 17.5v.01"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5L15.5 10"/></symbol>
+  </svg>
+ 
+  <a class="skip-link" href="#main">Aller au contenu</a>
+ 
+  <header class="app-header">
+    <div class="brand">
+      <svg class="icon brand__logo" aria-hidden="true"><use href="#i-shield"/></svg>
+      <span class="brand__name">P2P-VoteEngine</span>
+    </div>
+ 
+    <div class="header-tools">
+      <!-- Indicateur réseau : pastille + texte (jamais la couleur seule) -->
+      <div class="net" id="net" data-status="connecting" role="status">
+        <span class="net__dot" aria-hidden="true"></span>
+        <span class="net__label" id="net-label">Connexion en cours</span>
+      </div>
+ 
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Passer au thème sombre">
+        <svg class="icon icon-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+        <svg class="icon icon-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+      </button>
+    </div>
+  </header>
+ 
+  <main id="main" class="page">
+ 
+    <section class="card" aria-labelledby="page-title">
+      <header class="card__head">
+        <h1 id="page-title">Salle d’attente</h1>
+        <p class="session-chip">Session <code id="session-id">—</code></p>
+      </header>
+ 
+      <p class="status-text" id="status-text" role="status" aria-live="polite">Préparation de la connexion…</p>
+ 
+      <!-- Stepper en 3 étapes -->
+      <ol class="stepper" id="stepper" aria-label="Étapes de connexion">
+        <li class="step" data-step="host" data-status="pending">
+          <span class="step__icon" aria-hidden="true"><svg class="icon"><use href="#i-clock"/></svg></span>
+          <div class="step__body">
+            <div class="step__row">
+              <h2 class="step__title">Connexion à l’hôte</h2>
+              <span class="step__badge">En attente</span>
+            </div>
+            <p class="step__detail"></p>
+          </div>
+        </li>
+        <li class="step" data-step="mesh" data-status="pending">
+          <span class="step__icon" aria-hidden="true"><svg class="icon"><use href="#i-clock"/></svg></span>
+          <div class="step__body">
+            <div class="step__row">
+              <h2 class="step__title">Maillage avec les pairs</h2>
+              <span class="step__badge">En attente</span>
+            </div>
+            <p class="step__detail"></p>
+          </div>
+        </li>
+        <li class="step" data-step="sync" data-status="pending">
+          <span class="step__icon" aria-hidden="true"><svg class="icon"><use href="#i-clock"/></svg></span>
+          <div class="step__body">
+            <div class="step__row">
+              <h2 class="step__title">Synchronisation du registre</h2>
+              <span class="step__badge">En attente</span>
+            </div>
+            <p class="step__detail"></p>
+          </div>
+        </li>
+      </ol>
+ 
+      <!-- Message d’erreur / d’avertissement / de succès (région d’alerte toujours présente) -->
+      <div id="banner-region" role="alert"></div>
+ 
+      <div class="panels">
+        <section class="panel" aria-labelledby="peers-title">
+          <h2 class="panel__title" id="peers-title">Pairs connectés</h2>
+          <p class="peers__value"><span id="peer-count">0</span><span class="peers__of" id="peer-of"></span></p>
+          <p class="peers__label" id="peer-label">pair connecté</p>
+          <div id="failed-block" hidden>
+            <p class="failed__title" id="failed-title">Injoignables</p>
+            <ul class="failed__list" id="failed-list" aria-labelledby="failed-title"></ul>
+          </div>
+        </section>
+ 
+        <section class="panel" aria-labelledby="sync-title">
+          <h2 class="panel__title" id="sync-title">Synchronisation</h2>
+          <div class="progress" id="progress" role="progressbar" aria-labelledby="sync-title"
+               aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="En attente" data-status="pending">
+            <div class="progress__bar" id="progress-bar"></div>
+          </div>
+          <p class="progress__text" id="sync-text">En attente</p>
+        </section>
+      </div>
+ 
+      <div class="actions">
+        <button class="btn btn--primary" id="btn-vote" type="button" hidden>Accéder au bulletin</button>
+        <button class="btn btn--primary" id="btn-retry" type="button" hidden>Réessayer</button>
+        <button class="btn btn--secondary" id="btn-continue" type="button" hidden>Continuer sans eux</button>
+        <button class="btn btn--secondary" id="btn-leave" type="button">Annuler</button>
+      </div>
+    </section>
+ 
+    <!-- Panneau de démonstration : visible uniquement avec l’adaptateur simulé. À retirer en production. -->
+    <aside class="demo" id="demo-panel" hidden>
+      <label class="demo__label" for="demo-select">Mode démonstration (réseau simulé)</label>
+      <select id="demo-select" class="demo__select">
+        <option value="ok">Tout fonctionne</option>
+        <option value="partial">Maillage partiel (puis réussite après « Réessayer »)</option>
+        <option value="timeout">Hôte muet : TIMEOUT (puis réussite après « Réessayer »)</option>
+        <option value="notfound">SESSION_NOT_FOUND (puis réussite après « Réessayer »)</option>
+        <option value="network">NETWORK_ERROR (puis réussite après « Réessayer »)</option>
+        <option value="syncfail">Échec de synchronisation (puis réussite après « Réessayer »)</option>
+        <option value="empty">Registre vide</option>
+        <option value="alone">Premier connecté (aucun autre pair)</option>
+      </select>
+    </aside>
+  </main>
+ 
+  <!-- Modale « Quitter la session » (fenêtre maison, pas de confirm() natif) -->
+  <dialog id="leave-dialog" aria-labelledby="leave-title" aria-describedby="leave-desc">
+    <div class="dialog__inner">
+      <h2 id="leave-title">Quitter la session ?</h2>
+      <p id="leave-desc">Vous allez quitter cette session. Vous pourrez la rejoindre à nouveau avec le Session ID tant que le scrutin est ouvert.</p>
+      <div class="dialog__actions">
+        <button class="btn btn--secondary" id="leave-stay" type="button" autofocus>Rester</button>
+        <button class="btn btn--danger" id="leave-confirm" type="button">Quitter la session</button>
+      </div>
+    </div>
+  </dialog>
+ 
+  <!--
+    Branchement réel (M1) : définir AVANT le script suivant
+      <script> window.WAITING_ROOM_ADAPTER = { connectToHost, meshWithPeers, syncLedger, onNetworkStatus?, leave? }; </script>
+    (voir le contrat en tête de js/voter/salle-attente.js)
+  -->
+  <script src="js/voter/salle-attente.js"></script>
+</body>
+</html>
+ 
