@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Génération d'une empreinte de reçu avec l'algorithme maison RHE-128 et création de son QR code.">
+  <title>Signature du reçu — P2P-VoteEngine</title>
+  <link rel="stylesheet" href="css/signature.css">
+  <script defer src="js/crypto/receiptHash.js"></script>
+  <!-- QRCode.js dessine le QR ; le hachage reste entièrement réalisé par RHE-128. -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script defer src="js/signature.js"></script>
+</head>
+<body>
+  <main class="signature-shell">
+    <header class="signature-header">
+      <a href="index.html">← Retour à l'accueil</a>
+      <h1>Signature du reçu de vote</h1>
+      <p>Entrez le contenu à signer. RHE-128 calcule une empreinte maison de 24 caractères, puis la page génère un QR code contenant cette empreinte.</p>
+    </header>
+
+    <section class="signature-card" aria-labelledby="form-title">
+      <h2 id="form-title">Générer une empreinte</h2>
+      <label class="signature-label" for="signature-input">Texte à transformer</label>
+      <textarea id="signature-input" placeholder="Exemple : Reçu de vote — Session ABCD1234 — Bloc 001" autocomplete="off"></textarea>
+      <div class="signature-actions">
+        <button class="signature-btn" id="signature-generate" type="button">Générer la signature</button>
+        <button class="signature-btn secondary" id="signature-copy" type="button" disabled>Copier l'empreinte</button>
+        <button class="signature-btn secondary" id="signature-download" type="button" disabled>Télécharger le QR</button>
+      </div>
+      <p id="signature-status" role="status" aria-live="polite"></p>
+
+      <section class="signature-result" id="signature-result" hidden aria-live="polite">
+        <h2>Empreinte RHE-128</h2>
+        <output id="signature-hash"></output>
+        <div class="qr-layout">
+          <div id="signature-qr" aria-label="QR code contenant l'empreinte"></div>
+          <p class="signature-hint">Scannez ce QR code pour récupérer l'empreinte. Le contenu encodé est exactement la chaîne affichée ci-dessus, et non le texte original.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

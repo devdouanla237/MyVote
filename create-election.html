@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Créer un scrutin — MyVote</title>
+  <link rel="stylesheet" href="css/variables.css"><link rel="stylesheet" href="css/global.css"><link rel="stylesheet" href="css/create-election.css">
+  <script type="module" src="js/create-election.js"></script>
+</head>
+<body>
+<main class="editor-shell">
+  <header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">M</span> MyVote</a><span class="eyebrow">ESPACE ORGANISATEUR</span></header>
+  <section class="editor-card">
+    <a class="back-link" href="index.html">← Retour à l’accueil</a>
+    <div class="eyebrow">NOUVEAU SCRUTIN</div><h1>Créer un scrutin</h1>
+    <p class="intro">Définissez les informations du scrutin et les choix proposés aux participants.</p>
+    <form id="election-form" novalidate>
+      <div class="field"><label for="title">Titre <span class="required">*</span></label><input id="title" name="title" maxlength="120" required placeholder="Ex. Élection du délégué de classe"><small class="error" id="title-error"></small></div>
+      <div class="field"><label for="description">Description <span class="optional">(facultative)</span></label><textarea id="description" name="description" rows="3" maxlength="1000" placeholder="Précisez le contexte ou les règles du scrutin"></textarea></div>
+      <div class="form-row">
+        <div class="field"><label for="vote-type">Type de scrutin</label><select id="vote-type"><option value="unique">Vote unique</option><option value="multiple">Vote multiple</option><option value="weighted">Vote pondéré</option></select></div>
+        <div class="field"><label for="end-date">Date et heure de fin</label><input id="end-date" type="datetime-local"><small class="error" id="date-error"></small></div>
+      </div>
+      <div id="multiple-settings" class="settings-panel" hidden><label for="max-choices">Nombre maximum de choix</label><input id="max-choices" type="number" min="1" step="1" value="2"><small>Le maximum ne peut pas dépasser le nombre de choix proposés.</small><small class="error" id="max-error"></small></div>
+      <section class="choices-section">
+        <div class="section-heading"><div><h2>Liste des choix</h2><p>Ajoutez au moins deux choix. Vous pourrez modifier leur ordre.</p></div><span class="choice-counter" id="choice-counter">2 choix</span></div>
+        <div id="choices-list" class="choices-list" aria-live="polite"></div>
+        <button class="button button-secondary" id="add-choice" type="button">＋ Ajouter un choix</button>
+        <small class="error" id="choices-error"></small>
+      </section>
+      <div id="form-message" class="form-message" role="status" aria-live="polite"></div>
+      <div class="form-actions"><a class="button button-quiet" href="index.html">Annuler</a><button class="button button-primary" type="submit">Suivant <span aria-hidden="true">→</span></button></div>
+    </form>
+  </section>
+  <footer>MyVote · Création d’un scrutin</footer>
+</main>
+</body></html>

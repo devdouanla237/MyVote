@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Rejoindre une session — MyVote</title>
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/global.css">
+        <link rel="stylesheet" href="css/join-session.css">
+        <script type="importmap">{"imports":{"peerjs":"https://esm.sh/peerjs@1.5.5"}}</script>
+        <script type="module" src="js/join-session.js"></script>
+    </head>
+<body>
+    <main class="join-shell">
+        <header class="topbar">
+            <a class="brand" href="index.html"><span class="brand-mark">M</span> MyVote</a>
+            <span class="eyebrow">ESPACE ÉLECTEUR</span>
+        </header>
+        <section class="join-card">
+            <a class="back-link" href="index.html">← Retour à l’accueil</a>
+            <div class="eyebrow">PARTICIPER À UN SCRUTIN</div>
+            <h1>Rejoindre une session</h1>
+            <p class="intro">Saisissez l’identifiant de session et le jeton qui vous ont été communiqués par l’organisateur.</p>
+            <form id="join-form" novalidate>
+                <div class="field">
+                    <label for="session-id">Session ID</label>
+                    <input id="session-id" type="text" maxlength="8" minlength="8" placeholder="AB12CD34" autocomplete="off" autocapitalize="characters" required><small>8 caractères : lettres majuscules et chiffres.</small>
+                    <small class="error" id="session-error"></small>
+                </div>
+                <div class="field">
+                    <label for="token">Jeton de participation</label>
+                    <div class="token-wrap">
+                        <input id="token" type="password" autocomplete="one-time-code" placeholder="Saisissez votre jeton" required>
+                        <button id="toggle-token" type="button" class="show-button" aria-pressed="false">Afficher</button>
+                    </div>
+                    <small class="error" id="token-error"></small>
+                </div>
+                <div id="join-message" class="join-message" role="status" aria-live="polite">Vos informations ne sont pas envoyées tant que vous n’appuyez pas sur « Rejoindre ».</div>
+                <button id="join-button" class="button button-primary" type="submit">
+                    <span class="spinner" hidden></span>
+                    <span class="button-label">Rejoindre</span>
+                </button>
+            </form>
+        </section>
+        <footer>
+            MyVote · Système de vote pair-à-pair
+        </footer>
+    </main>
+</body>
+</html>
