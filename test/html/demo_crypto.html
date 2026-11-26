@@ -16,16 +16,36 @@
   <h2>Clé privée</h2>
   <pre id="privee"></pre>
 
+  <h2>2. Chiffrer un choix</h2>
+  <input type="text" id="choix" value="Dupont">
+  <button id="btnChiffrer">Chiffrer</button>
+  <pre id="chiffre"></pre>
+
+  <h2>3. Déchiffrer</h2>
+  <button id="btnDechiffrer">Déchiffrer avec la bonne clé</button>
+  <button id="btnMauvaiseCle">Déchiffrer avec une mauvaise clé</button>
+
+  <h2>Résultat</h2>
+  <pre id="message"></pre>
 
   <script type="module"   >
     import { generateKeyPair, importPublicKey, importPrivateKey } from "../../js/crypto/keys.js";
+    import { encryptBallot, decryptBallot } from "../../js/crypto/ballot.js";
+
     const bouton = document.getElementById("bouton");
     const zonePublique = document.getElementById("publique");
     const zonePrivee = document.getElementById("privee");
+    const champChoix = document.getElementById("choix");
+    const zoneChiffre = document.getElementById("chiffre");
+    const zoneMessage = document.getElementById("message");
+
+    let cles = null;     
+    let bulletin = null;
+    
 
     bouton.addEventListener("click", async function () {
     
-      const cles = await generateKeyPair();
+      cles = await generateKeyPair();
       console.log("Clés générées :", cles);
 
       zonePublique.textContent = JSON.stringify(cles.publicKey, null, 2);
@@ -34,6 +54,53 @@
       await importPublicKey(cles.publicKey);
       await importPrivateKey(cles.privateKey);
       console.log("OK");
+      });
+
+      document.getElementById("btnChiffrer").addEventListener("click", async function () {
+      if (cles === null) {
+        zoneMessage.textContent = "Générez d'abord les clés (étape 1).";
+        return;
+      }
+
+       try {
+        bulletin = await encryptBallot(cles.publicKey, champChoix.value);
+        zoneChiffre.textContent = bulletin;
+        zoneMessage.textContent = "Chiffrement réussi (" + bulletin.length + " caractères).";
+      } catch (erreur) {
+        zoneMessage.textContent = "Erreur : " + erreur.code + "\n" + erreur.message;
+      }
+    });
+
+     document.getElementById("btnDechiffrer").addEventListener("click", async function () {
+      if (bulletin === null) {
+        zoneMessage.textContent = "Chiffrez d'abord un choix (étape 2).";
+        return;
+      }
+
+      try {
+        const choix = await decryptBallot(cles.privateKey, bulletin);
+        zoneMessage.textContent = "Choix retrouvé : " + choix;
+      } catch (erreur) {
+        zoneMessage.textContent = "Erreur : " + erreur.code + "\n" + erreur.message;
+      }
+    });
+
+    document.getElementById("btnMauvaiseCle").addEventListener("click", async function () {
+      if (bulletin === null) {
+        zoneMessage.textContent = "Chiffrez d'abord un choix (étape 2).";
+        return;
+      }
+
+      // On fabrique une AUTRE paire de clés, qui n'a pas servi à chiffrer
+      const autresCles = await generateKeyPair();
+
+      try {
+        const choix = await decryptBallot(autresCles.privateKey, bulletin);
+        zoneMessage.textContent = "Choix retrouvé : " + choix + " (ce n'est pas normal !)";
+      } catch (erreur) {
+        zoneMessage.textContent = "Erreur attendue : " + erreur.code + "\n" + erreur.message;
+      }
+
     });
   </script>
   
